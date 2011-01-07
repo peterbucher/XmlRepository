@@ -214,8 +214,22 @@ namespace XmlRepository
         {
             lock (this._lockObject)
             {
-                return this._toObjectFunction(
-                    this.GetElementsByKeyValuePair(this._defaultQueryProperty, value).Single());
+                return this.LoadAllBy(queryProperty, value).Single();
+            }
+        }
+
+        /// <summary>
+        /// Loads the entity that matches the given predicate.
+        /// </summary>
+        /// <param name="predicate">The predicate.</param>
+        /// <returns>
+        /// The entity, if an entity was found. Otherwise, an exception is thrown.
+        /// </returns>
+        public TEntity LoadBy(Func<TEntity, bool> predicate)
+        {
+            lock (this._lockObject)
+            {
+                return LoadAll().Where(predicate).Single();
             }
         }
 
@@ -236,17 +250,35 @@ namespace XmlRepository
         }
 
         /// <summary>
+        /// Loads all entities with the specified value for the given query property.
+        /// </summary>
+        /// <param name="queryProperty">The name of the query property.</param>
+        /// <param name="value">The value.</param>
+        /// <returns>
+        /// A list of all entities. If no entities were found, an empty list is returned.
+        /// </returns>
+        public IEnumerable<TEntity> LoadAllBy(string queryProperty, object value)
+        {
+            lock (this._lockObject)
+            {
+                return
+                    (from e in this.GetElementsByKeyValuePair(this._defaultQueryProperty, value)
+                     select this._toObjectFunction(e)).ToList();
+            }
+        }
+
+        /// <summary>
         /// Loads all entities that match the given predicate.
         /// </summary>
         /// <param name="predicate">The predicate.</param>
         /// <returns>
         /// A list of all entities. If no entities were found, an empty list is returned.
         /// </returns>
-        public IEnumerable<TEntity> LoadAll(Func<TEntity, bool> predicate)
+        public IEnumerable<TEntity> LoadAllBy(Func<TEntity, bool> predicate)
         {
             lock (this._lockObject)
             {
-                return LoadAll().Where(predicate);
+                return LoadAll().Where(predicate).ToList();
             }
         }
 
