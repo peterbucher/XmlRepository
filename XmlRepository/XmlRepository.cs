@@ -68,18 +68,18 @@ namespace XmlRepository
         /// </summary>
         /// <typeparam name="TEntity">The entity type.</typeparam>
         /// <returns>An xml repository.</returns>
-        public static IXmlRepository<TEntity> GetInstance<TEntity>()
+        public static IXmlRepository<TEntity, dynamic> GetInstance<TEntity>()
         {
             lock (LockObject)
             {
                 // If the repository does not yet exist, create it.
                 if (!Repositories.ContainsKey(typeof(TEntity)))
                 {
-                    Repositories.Add(typeof(TEntity), new XmlRepository<TEntity>());
+                    Repositories.Add(typeof(TEntity), new XmlRepository<TEntity, dynamic>());
                 }
 
                 // Return the requested repository to the caller.
-                return Repositories[typeof(TEntity)] as IXmlRepository<TEntity>;
+                return Repositories[typeof(TEntity)] as IXmlRepository<TEntity, dynamic>;
             }
         }
     }
@@ -87,7 +87,9 @@ namespace XmlRepository
     /// <summary>
     /// Represents an xml repository.
     /// </summary>
-    internal class XmlRepository<TEntity> : IXmlRepository<TEntity>
+    /// <typeparam name="TEntity">The entity type.</typeparam>
+    /// <typeparam name="TIdentity">The identity type.</typeparam>
+    internal class XmlRepository<TEntity, TIdentity> : IXmlRepository<TEntity, TIdentity>
     {
         /// <summary>
         /// Contains the lock object for instance locking.
@@ -185,7 +187,7 @@ namespace XmlRepository
         /// <returns>
         /// The entity, if an entity was found. Otherwise, an exception is thrown.
         /// </returns>
-        public TEntity Load(object value)
+        public TEntity Load(TIdentity value)
         {
             lock (this._lockObject)
             {
@@ -302,9 +304,8 @@ namespace XmlRepository
         /// <summary>
         /// Deletes the entity with the given identity value.
         /// </summary>
-        /// <typeparam name="TIdentity"></typeparam>
         /// <param name="value">The identity value.</param>
-        public void DeleteOnSubmit<TIdentity>(TIdentity value)
+        public void DeleteOnSubmit(TIdentity value)
         {
             lock (this._lockObject)
             {

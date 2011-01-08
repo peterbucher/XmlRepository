@@ -13,7 +13,9 @@ namespace XmlRepository.Contracts
     /// <summary>
     /// Represents an xml repository.
     /// </summary>
-    public interface IXmlRepository<TEntity> : IXmlRepository
+    /// <typeparam name="TEntity">The entity type.</typeparam>
+    /// <typeparam name="TIdentity">The identity type.</typeparam>
+    public interface IXmlRepository<TEntity, in TIdentity> : IXmlRepository
     {
         /// <summary>
         /// Loads the entity with the specified value for the default query property.
@@ -22,7 +24,7 @@ namespace XmlRepository.Contracts
         /// <returns>
         /// The entity, if an entity was found. Otherwise, an exception is thrown.
         /// </returns>
-        TEntity Load(object value);
+        TEntity Load(TIdentity value);
 
         /// <summary>
         /// Loads the entity with the specified value for the given query property.
@@ -79,9 +81,8 @@ namespace XmlRepository.Contracts
         /// <summary>
         /// Deletes the entity with the given identity value.
         /// </summary>
-        /// <typeparam name="TIdentity"></typeparam>
         /// <param name="value">The identity value.</param>
-        void DeleteOnSubmit<TIdentity>(TIdentity value);
+        void DeleteOnSubmit(TIdentity value);
 
         /// <summary>
         /// Deletes all entities.
