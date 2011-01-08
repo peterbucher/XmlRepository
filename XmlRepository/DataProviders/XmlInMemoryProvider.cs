@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Xml.Linq;
 using XmlRepository.Contracts;
 
@@ -27,14 +28,14 @@ namespace XmlRepository.DataProviders
         /// <returns>The root element.</returns>
         public XElement Load<TEntity>()
         {
-            lock(this._lock)
+            lock (this._lock)
             {
-                if(!this._elements.ContainsKey(typeof(TEntity)))
+                if (!this._elements.ContainsKey(typeof(TEntity)))
                 {
                     this._elements.Add(typeof(TEntity), new XElement(XmlRepository.RootElementName));
                 }
 
-                return this._elements[typeof (TEntity)];
+                return this.Clone(this._elements[typeof(TEntity)]);
             }
         }
 
@@ -45,7 +46,7 @@ namespace XmlRepository.DataProviders
         /// <param name="rootElement">The root element.</param>
         public void Save<TEntity>(XElement rootElement)
         {
-            lock(this._lock)
+            lock (this._lock)
             {
                 if (!this._elements.ContainsKey(typeof(TEntity)))
                 {
@@ -53,7 +54,7 @@ namespace XmlRepository.DataProviders
                     return;
                 }
 
-                this._elements[typeof(TEntity)] = rootElement;
+                this._elements[typeof(TEntity)] = this.Clone(rootElement);
             }
         }
 
@@ -72,6 +73,18 @@ namespace XmlRepository.DataProviders
             {
                 handler(this, DataSourceChangedEventArgs.Empty);
             }
+        }
+
+        /// <summary>
+        /// Clones the given XElement.
+        /// </summary>
+        /// <param name="source">The source XElement.</param>
+        /// <returns>The cloned XElement.</returns>
+        private XElement Clone(XElement source)
+        {
+            var tempFile = Path.GetTempFileName();
+            source.Save(tempFile);
+            return XElement.Load(tempFile);
         }
     }
 }

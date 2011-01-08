@@ -67,7 +67,9 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Entities\Person.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="XmlRepositoryTests.cs" />
   </ItemGroup>
   <ItemGroup>
     <BootstrapperPackage Include=".NETFramework,Version=v4.0">
@@ -92,6 +94,10 @@
     </BootstrapperPackage>
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\XmlRepository.Contracts\XmlRepository.Contracts.csproj">
+      <Project>{D767D082-CF51-449C-963C-BCBC8CF6BB9E}</Project>
+      <Name>XmlRepository.Contracts</Name>
+    </ProjectReference>
     <ProjectReference Include="..\XmlRepository\XmlRepository.csproj">
       <Project>{78BD1D21-0F16-43E5-AD49-1B0991114D30}</Project>
       <Name>XmlRepository</Name>
