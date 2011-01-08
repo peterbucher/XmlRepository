@@ -19,7 +19,7 @@ namespace XmlRepository.UI.Web
 
         private void _Default_Load(object sender, EventArgs e)
         {
-            using (var repository = XmlRepository<Todo>.Instance)
+            using (var repository = XmlRepository.GetInstance<Todo>())
             {
                 var currentId = Request.QueryString["id"].ToOrDefault<Guid>();
                 if (currentId != Guid.Empty)
@@ -41,7 +41,7 @@ namespace XmlRepository.UI.Web
 
         private void btnSubmit_Click(object sender, EventArgs e)
         {
-            using (var repository = XmlRepository<Todo>.Instance)
+            using (var repository = XmlRepository.GetInstance<Todo>())
             {
                 var currentId = Request.QueryString["id"].ToOrDefault<Guid>();
                 var todo = (currentId == Guid.Empty) ? (new Todo { Id = Guid.NewGuid() }) : repository.Load(currentId);
@@ -58,7 +58,7 @@ namespace XmlRepository.UI.Web
 
         private void btnClearContent_Click(object sender, EventArgs e)
         {
-            using (var repository = XmlRepository<Todo>.Instance)
+            using (var repository = XmlRepository.GetInstance<Todo>())
             {
                 repository.DeleteAllOnSubmit();
                 this.Response.Redirect("~/Default.aspx");

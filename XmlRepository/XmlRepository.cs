@@ -14,6 +14,16 @@ namespace XmlRepository
     public static class XmlRepository
     {
         /// <summary>
+        /// Contains the lock object for type locking.
+        /// </summary>
+        private static readonly object LockObject = new object();
+
+        /// <summary>
+        /// Contains a list of all repositories created so far, for reuse.
+        /// </summary>
+        private static readonly IDictionary<Type, IXmlRepository> Repositories;
+
+        /// <summary>
         /// Gets the name of the root element.
         /// </summary>
         internal static readonly string RootElementName = "root";
@@ -47,25 +57,42 @@ namespace XmlRepository
         /// </summary>
         static XmlRepository()
         {
+            Repositories = new Dictionary<Type, IXmlRepository>();
             DataProvider = new XmlFileProvider(Environment.CurrentDirectory);
             DefaultQueryProperty = "Id";
+        }
+
+        /// <summary>
+        /// Gets an xml repository for the specified entity type. If the repository has not been
+        /// created yet, a new one is created; otherwise, the existing one is returned.
+        /// </summary>
+        /// <typeparam name="TEntity">The entity type.</typeparam>
+        /// <returns>An xml repository.</returns>
+        public static IXmlRepository<TEntity> GetInstance<TEntity>()
+        {
+            lock (LockObject)
+            {
+                // If the repository does not yet exist, create it.
+                if (!Repositories.ContainsKey(typeof(TEntity)))
+                {
+                    Repositories.Add(typeof(TEntity), new XmlRepository<TEntity>());
+                }
+
+                // Return the requested repository to the caller.
+                return Repositories[typeof(TEntity)] as IXmlRepository<TEntity>;
+            }
         }
     }
 
     /// <summary>
     /// Represents an xml repository.
     /// </summary>
-    public class XmlRepository<TEntity> : IXmlRepository<TEntity>
+    internal class XmlRepository<TEntity> : IXmlRepository<TEntity>
     {
         /// <summary>
         /// Contains the lock object for instance locking.
         /// </summary>
         private readonly object _lockObject = new object();
-
-        /// <summary>
-        /// Contains the lock object for type locking.
-        /// </summary>
-        private static readonly object LockObject = new object();
 
         /// <summary>
         /// Contains the conversion method which converts the entity to an XElement.
@@ -100,45 +127,9 @@ namespace XmlRepository
         private bool _isDirty;
 
         /// <summary>
-        /// Contains a list of all repositories created so far, for reuse.
-        /// </summary>
-        private static readonly IDictionary<Type, IXmlRepository> Repositories;
-
-        /// <summary>
-        /// Gets the repository for the specified type. If the repository has not been created yet,
-        /// a new one is created; otherwise, the existing one is returned.
-        /// </summary>
-        /// <value>The repository for the requested type.</value>
-        public static IXmlRepository<TEntity> Instance
-        {
-            get
-            {
-                lock (LockObject)
-                {
-                    // If the repository does not yet exist, create it.
-                    if (!Repositories.ContainsKey(typeof(TEntity)))
-                    {
-                        Repositories.Add(typeof(TEntity), new XmlRepository<TEntity>());
-                    }
-
-                    // Return the requested repository to the caller.
-                    return Repositories[typeof(TEntity)] as IXmlRepository<TEntity>;
-                }
-            }
-        }
-
-        /// <summary>
-        /// Initializes the <see cref="XmlRepository" /> type.
-        /// </summary>
-        static XmlRepository()
-        {
-            Repositories = new Dictionary<Type, IXmlRepository>();
-        }
-
-        /// <summary>
         /// Creates a new instance of the <see cref="XmlRepository" /> type.
         /// </summary>
-        private XmlRepository()
+        internal XmlRepository()
         {
             lock (this._lockObject)
             {
