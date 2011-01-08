@@ -1,4 +1,4 @@
-﻿namespace TodoWebApp.Entities
+﻿namespace XmlRepository.UI.Web.Entities
 {
     public class Todo : EntityBase
     {

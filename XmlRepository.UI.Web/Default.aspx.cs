@@ -2,7 +2,7 @@
 using System.Linq;
 using System.Web.UI;
 using cherryflavored.net.ExtensionMethods.System;
-using TodoWebApp.Entities;
+using XmlRepository.UI.Web.Entities;
 
 namespace XmlRepository.UI.Web
 {
