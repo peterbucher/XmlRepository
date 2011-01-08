@@ -68,18 +68,18 @@ namespace XmlRepository
         /// </summary>
         /// <typeparam name="TEntity">The entity type.</typeparam>
         /// <returns>An xml repository.</returns>
-        public static IXmlRepository<TEntity, dynamic> GetInstance<TEntity>()
+        public static IXmlRepository<TEntity> GetInstance<TEntity>()
         {
             lock (LockObject)
             {
                 // If the repository does not yet exist, create it.
                 if (!Repositories.ContainsKey(typeof(TEntity)))
                 {
-                    Repositories.Add(typeof(TEntity), new XmlRepository<TEntity, dynamic>());
+                    Repositories.Add(typeof(TEntity), new XmlRepository<TEntity>());
                 }
 
                 // Return the requested repository to the caller.
-                return Repositories[typeof(TEntity)] as IXmlRepository<TEntity, dynamic>;
+                return Repositories[typeof(TEntity)] as IXmlRepository<TEntity>;
             }
         }
     }
@@ -88,8 +88,7 @@ namespace XmlRepository
     /// Represents an xml repository.
     /// </summary>
     /// <typeparam name="TEntity">The entity type.</typeparam>
-    /// <typeparam name="TIdentity">The identity type.</typeparam>
-    internal class XmlRepository<TEntity, TIdentity> : IXmlRepository<TEntity, TIdentity>
+    internal class XmlRepository<TEntity> : IXmlRepository<TEntity>
     {
         /// <summary>
         /// Contains the lock object for instance locking.
@@ -181,37 +180,6 @@ namespace XmlRepository
         }
 
         /// <summary>
-        /// Loads the entity with the specified value for the default query property.
-        /// </summary>
-        /// <param name="value">The value.</param>
-        /// <returns>
-        /// The entity, if an entity was found. Otherwise, an exception is thrown.
-        /// </returns>
-        public TEntity Load(TIdentity value)
-        {
-            lock (this._lockObject)
-            {
-                return this.LoadBy(this._defaultQueryProperty, value);
-            }
-        }
-
-        /// <summary>
-        /// Loads the entity with the specified value for the given query property.
-        /// </summary>
-        /// <param name="queryProperty">The name of the query property.</param>
-        /// <param name="value">The value.</param>
-        /// <returns>
-        /// The entity, if an entity was found. Otherwise, an exception is thrown.
-        /// </returns>
-        public TEntity LoadBy(string queryProperty, object value)
-        {
-            lock (this._lockObject)
-            {
-                return this.LoadAllBy(queryProperty, value).Single();
-            }
-        }
-
-        /// <summary>
         /// Loads the entity that matches the given predicate.
         /// </summary>
         /// <param name="predicate">The predicate.</param>
@@ -238,24 +206,6 @@ namespace XmlRepository
             {
                 return
                     (from e in this._rootElement.Elements()
-                     select this._toObjectFunction(e)).ToList();
-            }
-        }
-
-        /// <summary>
-        /// Loads all entities with the specified value for the given query property.
-        /// </summary>
-        /// <param name="queryProperty">The name of the query property.</param>
-        /// <param name="value">The value.</param>
-        /// <returns>
-        /// A list of all entities. If no entities were found, an empty list is returned.
-        /// </returns>
-        public IEnumerable<TEntity> LoadAllBy(string queryProperty, object value)
-        {
-            lock (this._lockObject)
-            {
-                return
-                    (from e in this.GetElementsByKeyValuePair(this._defaultQueryProperty, value)
                      select this._toObjectFunction(e)).ToList();
             }
         }
@@ -302,15 +252,16 @@ namespace XmlRepository
         }
 
         /// <summary>
-        /// Deletes the entity with the given identity value.
+        /// Deletes the entities that match given predicate.
         /// </summary>
-        /// <param name="value">The identity value.</param>
-        public void DeleteOnSubmit(TIdentity value)
+        /// <param name="predicate">The predicate.</param>
+        public void DeleteOnSubmit(Func<TEntity, bool> predicate)
         {
             lock (this._lockObject)
             {
-                this.GetElementsByKeyValuePair(
-                    this._defaultQueryProperty, value).Single().Remove();
+                (from e in this._rootElement.Elements()
+                    where predicate(this._toObjectFunction(e))
+                    select e).Remove();
                 this._isDirty = true;
             }
         }

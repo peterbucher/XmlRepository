@@ -29,7 +29,7 @@ namespace XmlRepository.UI.Web
 
                 if (!this.IsPostBack && currentId != Guid.Empty)
                 {
-                    Todo todo = repository.Load(currentId);
+                    Todo todo = repository.LoadBy(t => t.Id == currentId);
                     txtTitle.Text = todo.Title;
                     txtText.Text = todo.Text;
                 }
@@ -44,7 +44,9 @@ namespace XmlRepository.UI.Web
             using (var repository = XmlRepository.GetInstance<Todo>())
             {
                 var currentId = Request.QueryString["id"].ToOrDefault<Guid>();
-                var todo = (currentId == Guid.Empty) ? (new Todo { Id = Guid.NewGuid() }) : repository.Load(currentId);
+                var todo = (currentId == Guid.Empty)
+                               ? (new Todo {Id = Guid.NewGuid()})
+                               : repository.LoadBy(t => t.Id == currentId);
 
                 todo.Title = txtTitle.Text;
                 todo.Text = txtText.Text;

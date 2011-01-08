@@ -14,28 +14,8 @@ namespace XmlRepository.Contracts
     /// Represents an xml repository.
     /// </summary>
     /// <typeparam name="TEntity">The entity type.</typeparam>
-    /// <typeparam name="TIdentity">The identity type.</typeparam>
-    public interface IXmlRepository<TEntity, in TIdentity> : IXmlRepository
+    public interface IXmlRepository<TEntity> : IXmlRepository
     {
-        /// <summary>
-        /// Loads the entity with the specified value for the default query property.
-        /// </summary>
-        /// <param name="value">The value.</param>
-        /// <returns>
-        /// The entity, if an entity was found. Otherwise, an exception is thrown.
-        /// </returns>
-        TEntity Load(TIdentity value);
-
-        /// <summary>
-        /// Loads the entity with the specified value for the given query property.
-        /// </summary>
-        /// <param name="queryProperty">The name of the query property.</param>
-        /// <param name="value">The value.</param>
-        /// <returns>
-        /// The entity, if an entity was found. Otherwise, an exception is thrown.
-        /// </returns>
-        TEntity LoadBy(string queryProperty, object value);
-
         /// <summary>
         /// Loads the entity that matches the given predicate.
         /// </summary>
@@ -54,16 +34,6 @@ namespace XmlRepository.Contracts
         IEnumerable<TEntity> LoadAll();
 
         /// <summary>
-        /// Loads all entities with the specified value for the given query property.
-        /// </summary>
-        /// <param name="queryProperty">The name of the query property.</param>
-        /// <param name="value">The value.</param>
-        /// <returns>
-        /// A list of all entities. If no entities were found, an empty list is returned.
-        /// </returns>
-        IEnumerable<TEntity> LoadAllBy(string queryProperty, object value);
-
-        /// <summary>
         /// Loads all entities that match the given predicate.
         /// </summary>
         /// <param name="predicate">The predicate.</param>
@@ -79,10 +49,10 @@ namespace XmlRepository.Contracts
         void SaveOnSubmit(TEntity entity);
 
         /// <summary>
-        /// Deletes the entity with the given identity value.
+        /// Deletes the entities that match given predicate.
         /// </summary>
-        /// <param name="value">The identity value.</param>
-        void DeleteOnSubmit(TIdentity value);
+        /// <param name="predicate">The predicate.</param>
+        void DeleteOnSubmit(Func<TEntity, bool> predicate);
 
         /// <summary>
         /// Deletes all entities.
