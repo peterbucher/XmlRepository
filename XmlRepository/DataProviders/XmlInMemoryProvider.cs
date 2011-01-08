@@ -65,12 +65,12 @@ namespace XmlRepository.DataProviders
         /// <summary>
         /// Raises the DataSourceChanged event.
         /// </summary>
-        internal virtual void OnDataSourceChanged()
+        protected virtual void OnDataSourceChanged()
         {
             var handler = this.DataSourceChanged;
             if (handler != null)
             {
-                handler(this, new DataSourceChangedEventArgs(String.Empty));
+                handler(this, DataSourceChangedEventArgs.Empty);
             }
         }
     }
