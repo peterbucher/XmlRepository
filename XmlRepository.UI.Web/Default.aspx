@@ -44,9 +44,17 @@
                     &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="highlight">XML-basiertes Repository für .NET-Objekte, welches das Dateisystem und<br />
                     &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;In-Memory unterstützt.</span><br />
                     &nbsp;&nbsp;&nbsp;&nbsp;]]&gt;&lt;/description&gt;<br />
+                    &nbsp;&nbsp;&nbsp;&nbsp;&lt;example&gt;&lt;![CDATA[<br />
+                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;using(var repository = XmlRepository.GetInstance&lt;Foo&gt;) {<br />
+                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;var foos = repository.LoadAll(f => f.Id > 42);<br />
+                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;repository.SaveOnSubmit(new Foo { ... });<br />
+                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;repository.Delete(f =&gt; f.Id == 23);<br />
+                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}<br />
+                    &nbsp;&nbsp;&nbsp;&nbsp;]]&gt;&lt;/example&gt;<br />
                     &nbsp;&nbsp;&nbsp;&nbsp;&lt;downloads&gt;<br />
                     &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;download type="<a href="/Downloads/XmlRepository-201101091814.zip">assembly-net3.5</a>" mime="application/zip" /&gt;<br />
                     &nbsp;&nbsp;&nbsp;&nbsp;&lt;/downloads&gt;<br />
+                    &nbsp;&nbsp;&nbsp;&nbsp;&lt;documentation /&gt;<br />
                     &nbsp;&nbsp;&nbsp;&nbsp;&lt;copyright&gt;&lt;![CDATA[<br />
                     &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&copy; Copyright 2009-<%= DateTime.Now.Year %> <a href="http://www.peterbucher.ch">Peter Bucher</a> und <a href="http://www.goloroden.de">Golo Roden</a>. Alle Rechte vorbehalten.<br />
                     &nbsp;&nbsp;&nbsp;&nbsp;]]&gt;&lt;/copyright&gt;<br />
