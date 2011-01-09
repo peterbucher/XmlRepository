@@ -43,10 +43,10 @@
                     &nbsp;&nbsp;&nbsp;&nbsp;&lt;description&gt;&lt;![CDATA[<br />
                     &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="highlight">Store PONOs (plain old .NET objects) as XML in memory or to disk.</span><br />
                     &nbsp;&nbsp;&nbsp;&nbsp;]]&gt;&lt;/description&gt;<br />
-                    &nbsp;&nbsp;&nbsp;&nbsp;&lt;download&gt;<br />
-                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;download type="<a href="">sources</a>" mimeType="application/zip" /&gt;<br />
-                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;download type="<a href="">binary</a>" mimeType="application/zip" /&gt;<br />
-                    &nbsp;&nbsp;&nbsp;&nbsp;&lt;/download&gt;<br />
+                    &nbsp;&nbsp;&nbsp;&nbsp;&lt;downloads&gt;<br />
+                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;download type="<a href="">sources</a>" mime="application/zip" /&gt;<br />
+                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;download type="<a href="">binary</a>" mime="application/zip" /&gt;<br />
+                    &nbsp;&nbsp;&nbsp;&nbsp;&lt;/downloads&gt;<br />
                     &nbsp;&nbsp;&nbsp;&nbsp;&lt;copyright&gt;&lt;![CDATA[<br />
                     &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&copy; Copyright 2011 <a href="http://www.peterbucher.ch">Peter Bucher</a> und <a href="http://www.goloroden.de">Golo Roden</a>. Alle Rechte vorbehalten.<br />
                     &nbsp;&nbsp;&nbsp;&nbsp;]]&gt;&lt;/copyright&gt;<br />
