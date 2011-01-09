@@ -252,6 +252,21 @@ namespace XmlRepository
         }
 
         /// <summary>
+        /// Saves or updates the given entities.
+        /// </summary>
+        /// <param name="entities">The entities.</param>
+        public void SaveOnSubmit(IEnumerable<TEntity> entities)
+        {
+            lock(this._lockObject)
+            {
+                foreach (var entity in entities)
+                {
+                    this.SaveOnSubmit(entity);
+                }
+            }
+        }
+
+        /// <summary>
         /// Deletes the entities that match given predicate.
         /// </summary>
         /// <param name="predicate">The predicate.</param>

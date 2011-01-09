@@ -3,6 +3,7 @@ using System.Linq;
 using NUnit.Framework;
 using XmlRepository.DataProviders;
 using XmlRepository.Tests.Entities;
+using System.Collections.Generic;
 
 namespace XmlRepository.Tests
 {
@@ -30,8 +31,27 @@ namespace XmlRepository.Tests
                 };
 
             XmlRepository.DataProvider = new XmlInMemoryProvider();
-            using (var firstRepository = XmlRepository.GetInstance<Person>())
+            using(var firstRepository = XmlRepository.GetInstance<Person>())
             {
+                Assert.That(firstRepository.LoadAll().Count(), Is.EqualTo(0));
+
+                var persons = new List<Person> { peter, golo };
+                firstRepository.SaveOnSubmit(persons);
+                Assert.That(firstRepository.LoadAll().Count(), Is.EqualTo(2));
+                
+                firstRepository.DiscardChanges();
+                Assert.That(firstRepository.LoadAll().Count(), Is.EqualTo(0));
+
+                firstRepository.SaveOnSubmit(persons);
+                firstRepository.SubmitChanges();
+                firstRepository.DiscardChanges();
+
+                Assert.That(firstRepository.LoadAll().Count(), Is.EqualTo(2));
+
+                firstRepository.DeleteAllOnSubmit();
+                firstRepository.SubmitChanges();
+                Assert.That(() => firstRepository.LoadAll().Count(), Is.EqualTo(0));
+
                 Assert.That(firstRepository.LoadAll().Count(), Is.EqualTo(0));
                 Assert.That(firstRepository.LoadAllBy(p => p.Id == Guid.Empty).Count(), Is.EqualTo(0));
                 Assert.That(firstRepository.LoadAllBy(p => p.Id == peter.Id).Count(), Is.EqualTo(0));

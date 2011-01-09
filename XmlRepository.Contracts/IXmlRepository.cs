@@ -49,6 +49,12 @@ namespace XmlRepository.Contracts
         void SaveOnSubmit(TEntity entity);
 
         /// <summary>
+        /// Saves or updates the given entities.
+        /// </summary>
+        /// <param name="entities">The entities.</param>
+        void SaveOnSubmit(IEnumerable<TEntity> entities);
+
+        /// <summary>
         /// Deletes the entities that match given predicate.
         /// </summary>
         /// <param name="predicate">The predicate.</param>
