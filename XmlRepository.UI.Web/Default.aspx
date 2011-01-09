@@ -48,7 +48,7 @@
                     &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;download type="<a href="">binary</a>" mimeType="application/zip" /&gt;<br />
                     &nbsp;&nbsp;&nbsp;&nbsp;&lt;/download&gt;<br />
                     &nbsp;&nbsp;&nbsp;&nbsp;&lt;copyright&gt;&lt;![CDATA[<br />
-                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&copy; Copyright 2011 Peter Bucher und Golo Roden. Alle Rechte vorbehalten.<br />
+                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&copy; Copyright 2011 <a href="http://www.peterbucher.ch">Peter Bucher</a> und <a href="http://www.goloroden.de">Golo Roden</a>. Alle Rechte vorbehalten.<br />
                     &nbsp;&nbsp;&nbsp;&nbsp;]]&gt;&lt;/copyright&gt;<br />
                     &lt;/xmlrepository.ch&gt;
                 </p>
