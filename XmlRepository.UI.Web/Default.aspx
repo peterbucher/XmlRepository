@@ -41,8 +41,8 @@
                 <p>
                     &lt;xmlrepository.ch&gt;<br />
                     &nbsp;&nbsp;&nbsp;&nbsp;&lt;description&gt;&lt;![CDATA[<br />
-                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="highlight">XML-basiertes, threadsicheres Repository für flache .NET-Objekte, welches das<br />
-                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Dateisystem und In-Memory unterstützt.</span><br />
+                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="highlight">XML-basiertes, threadsicheres Repository für flache .NET-Objekte, welches<br />
+                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;das Dateisystem und In-Memory unterstützt.</span><br />
                     &nbsp;&nbsp;&nbsp;&nbsp;]]&gt;&lt;/description&gt;<br /><br />
                     &nbsp;&nbsp;&nbsp;&nbsp;&lt;example&gt;&lt;![CDATA[<br />
                     &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;XmlRepository.DefaultQueryProperty = "Id";<br />
