@@ -1,70 +1,8 @@
-﻿using System;
-using System.Linq;
-using System.Web.UI;
-using cherryflavored.net.ExtensionMethods.System;
-using XmlRepository.UI.Web.Entities;
+﻿using System.Web.UI;
 
 namespace XmlRepository.UI.Web
 {
-    public partial class _Default : Page
+    public partial class Default : Page
     {
-        protected override void OnInit(EventArgs e)
-        {
-            base.OnInit(e);
-
-            this.btnSubmit.Click += btnSubmit_Click;
-            this.btnClearContent.Click += btnClearContent_Click;
-            this.Load += _Default_Load;
-        }
-
-        private void _Default_Load(object sender, EventArgs e)
-        {
-            using (var repository = XmlRepository.GetInstance<Todo>())
-            {
-                var currentId = Request.QueryString["id"].ToOrDefault<Guid>();
-                if (currentId != Guid.Empty)
-                {
-                    this.btnSubmit.Text = "Ändern";
-                }
-
-                if (!this.IsPostBack && currentId != Guid.Empty)
-                {
-                    Todo todo = repository.LoadBy(t => t.Id == currentId);
-                    txtTitle.Text = todo.Title;
-                    txtText.Text = todo.Text;
-                }
-
-                rptTodos.DataSource = repository.LoadAll().OrderByDescending(t => t.DateCreated);
-                rptTodos.DataBind();
-            }
-        }
-
-        private void btnSubmit_Click(object sender, EventArgs e)
-        {
-            using (var repository = XmlRepository.GetInstance<Todo>())
-            {
-                var currentId = Request.QueryString["id"].ToOrDefault<Guid>();
-                var todo = (currentId == Guid.Empty)
-                               ? (new Todo {Id = Guid.NewGuid()})
-                               : repository.LoadBy(t => t.Id == currentId);
-
-                todo.Title = txtTitle.Text;
-                todo.Text = txtText.Text;
-                todo.DateCreated = DateTime.Now;
-
-                repository.SaveOnSubmit(todo);
-
-                Response.Redirect("~/Default.aspx");
-            }
-        }
-
-        private void btnClearContent_Click(object sender, EventArgs e)
-        {
-            using (var repository = XmlRepository.GetInstance<Todo>())
-            {
-                repository.DeleteAllOnSubmit();
-                this.Response.Redirect("~/Default.aspx");
-            }
-        }
     }
 }
