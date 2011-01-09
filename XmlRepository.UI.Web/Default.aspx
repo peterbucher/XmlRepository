@@ -58,7 +58,7 @@
                     &nbsp;&nbsp;&nbsp;&nbsp;&lt;/downloads&gt;<br /><br />
                     &nbsp;&nbsp;&nbsp;&nbsp;&lt;documentation /&gt;<br /><br />
                     &nbsp;&nbsp;&nbsp;&nbsp;&lt;copyright&gt;&lt;![CDATA[<br />
-                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&copy; Copyright 2009-<%= DateTime.Now.Year %> <a href="http://www.peterbucher.ch">Peter Bucher</a> und <a href="http://www.goloroden.de">Golo Roden</a>. Alle Rechte vorbehalten.<br />
+                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&copy; Copyright 2009-<%= DateTime.Now.Year %> <a href="http://www.goloroden.de">Golo Roden</a> und <a href="http://www.peterbucher.ch">Peter Bucher</a>. Alle Rechte vorbehalten.<br />
                     &nbsp;&nbsp;&nbsp;&nbsp;]]&gt;&lt;/copyright&gt;<br />
                     &lt;/xmlrepository.ch&gt;
                 </p>
