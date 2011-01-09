@@ -19,7 +19,7 @@
 
         <script src="/Scripts/jquery-1.4.2.min.js" type="text/javascript"></script>
 
-        <title>xmlrepository.ch | Startseite</title>
+        <title>xmlrepository.ch</title>
         
         <script type="text/javascript">
             var _gaq = _gaq || [];
@@ -41,7 +41,7 @@
                 <p>
                     &lt;xmlrepository.ch&gt;<br />
                     &nbsp;&nbsp;&nbsp;&nbsp;&lt;description&gt;&lt;![CDATA[<br />
-                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="highlight">Store PONOs (plain old .NET objects) as XML in memory or to disk.</span><br />
+                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="highlight">XML-basiertes Repository für .NET-Objekte, das das Dateisystem und In-Memory unterstützt.</span><br />
                     &nbsp;&nbsp;&nbsp;&nbsp;]]&gt;&lt;/description&gt;<br />
                     &nbsp;&nbsp;&nbsp;&nbsp;&lt;downloads&gt;<br />
                     &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;download type="<a href="">sources</a>" mime="application/zip" /&gt;<br />
