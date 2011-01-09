@@ -57,6 +57,8 @@
 
         <script type="text/javascript">
             $(document).ready(function () {
+                // Duplicate call to center() is required, at least for Google Chrome (other
+                // browsers were not tested yet).
                 center();
                 center();
             });
