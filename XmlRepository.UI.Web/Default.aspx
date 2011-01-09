@@ -54,7 +54,7 @@
                     &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}<br />
                     &nbsp;&nbsp;&nbsp;&nbsp;]]&gt;&lt;/example&gt;<br /><br />
                     &nbsp;&nbsp;&nbsp;&nbsp;&lt;downloads&gt;<br />
-                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;download type="<a href="/Downloads/XmlRepository-201101091814.zip">assembly-net3.5</a>" mime="application/zip" /&gt;<br />
+                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;download file="<a href="/Downloads/XmlRepository-201101091814.zip">assembly</a>" platform="net35" type="application/zip" /&gt;<br />
                     &nbsp;&nbsp;&nbsp;&nbsp;&lt;/downloads&gt;<br /><br />
                     &nbsp;&nbsp;&nbsp;&nbsp;&lt;documentation /&gt;<br /><br />
                     &nbsp;&nbsp;&nbsp;&nbsp;&lt;copyright&gt;&lt;![CDATA[<br />
