@@ -47,6 +47,9 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="Default.aspx" />
+    <Content Include="Scripts\jquery-1.4.2.min.js" />
+    <Content Include="Styles\Base.css" />
+    <Content Include="Styles\Layout.css" />
     <Content Include="Web.config" />
   </ItemGroup>
   <ItemGroup>

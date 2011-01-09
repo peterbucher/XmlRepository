@@ -1,0 +1,48 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Publish" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+    <PropertyGroup>
+        <BasePath>$(MSBuildProjectDirectory)\..\</BasePath>
+
+        <BuildFolder>C:\Temp\Build\xmlrepository.ch\</BuildFolder>
+        <PublishFolder>C:\inetpub\wwwroot\ch.xmlrepository.www\</PublishFolder>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <Solution Include="XmlRepository.sln" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <WebApplicationProjects Include="$(BasePath)XmlRepository.UI.Web\XmlRepository.UI.Web.csproj" />
+    </ItemGroup>
+
+    <Target Name="Clean">
+        <MSBuild
+          Projects="@(Solution)"
+          Targets="Clean" />
+        <RemoveDir
+          Directories="$(BuildFolder)" Condition="Exists($(BuildFolder))" />
+    </Target>
+
+    <Target Name="Build" DependsOnTargets="Clean">
+        <MSBuild
+          Projects="@(Solution)"
+          Targets="Build" />
+    </Target>
+
+    <Target Name="Publish" DependsOnTargets="Build">
+        <MakeDir
+          Directories="$(BuildFolder)" Condition="!Exists($(BuildFolder))" />
+        <MSBuild
+          Projects="@(WebApplicationProjects)"
+          Properties="OutDir=$(BuildFolder)"
+          Targets="Rebuild;ResolveReferences;_CopyWebApplication" />
+        <CreateItem Include="$(BuildFolder)_PublishedWebsites\XmlRepository.UI.Web\**\*.*">
+            <Output
+              ItemName="PublishedItems"
+              TaskParameter="Include" />
+        </CreateItem>
+        <Copy
+          SourceFiles="@(PublishedItems)"
+          DestinationFolder="$(PublishFolder)%(RecursiveDir)" />
+    </Target>
+</Project>

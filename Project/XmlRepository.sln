@@ -9,6 +9,13 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "XmlRepository.Tests", "..\X
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "XmlRepository.Contracts", "..\XmlRepository.Contracts\XmlRepository.Contracts.csproj", "{D767D082-CF51-449C-963C-BCBC8CF6BB9E}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Build Items", "Build Items", "{1373055A-C885-4762-8E4B-4A01190DA072}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "MSBuild", "MSBuild", "{0C494536-CC08-4BCF-A86C-2305A677C52C}"
+	ProjectSection(SolutionItems) = preProject
+		MSBuild.xml = MSBuild.xml
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -34,5 +41,8 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{0C494536-CC08-4BCF-A86C-2305A677C52C} = {1373055A-C885-4762-8E4B-4A01190DA072}
 	EndGlobalSection
 EndGlobal

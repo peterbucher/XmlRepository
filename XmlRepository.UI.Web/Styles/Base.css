@@ -1,0 +1,40 @@
+﻿*
+{
+    color:#444455;
+    font-family:Courier;
+}
+
+body
+{
+    font-size:small;
+}
+
+h1
+{
+    display:inline;
+    font-size:175%;
+    font-weight:bold;
+    line-height:175%;
+}
+
+p
+{
+    display:inline;
+}
+
+a
+{
+    color:#0055cc;
+    font-weight:bold;
+    text-decoration:none;
+}
+
+a:focus, a:hover
+{
+    text-decoration:underline;
+}
+
+.highlight
+{
+    font-weight:bold;
+}
