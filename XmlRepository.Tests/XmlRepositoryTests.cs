@@ -269,6 +269,24 @@ namespace XmlRepository.Tests
             }
         }
 
+        [Test]
+        public void GetEnumeratorReturnsAnEnumerator()
+        {
+            using (var repository = XmlRepository.GetInstance<Person>())
+            {
+                repository.SaveOnSubmit(new[] {this._peter, this._golo});
+                this.ExecuteLoadAsserts(repository, 2, true, true);
+
+                int count = 0;
+                foreach(var person in repository)
+                {
+                    Assert.That(person.Id, Is.Not.EqualTo(Guid.Empty));
+                    count++;
+                }
+                Assert.That(count, Is.EqualTo(2));
+            }
+        }
+
         private void ExecuteLoadAsserts(
             IXmlRepository<Person> repository,
             int totalNumberOfEntities,
