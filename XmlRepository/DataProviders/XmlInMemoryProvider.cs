@@ -14,12 +14,20 @@ namespace XmlRepository.DataProviders
         /// <summary>
         /// Contains the lock object.
         /// </summary>
-        private readonly object _lock = new object();
+        private readonly object _lockObject = new object();
 
         /// <summary>
         /// Contains the dictionary that holds the in-memory elements.
         /// </summary>
-        private readonly IDictionary<Type, XElement> _elements = new Dictionary<Type, XElement>();
+        private readonly IDictionary<Type, XElement> _elements;
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="XmlInMemoryProvider" /> type.
+        /// </summary>
+        public XmlInMemoryProvider()
+        {
+            this._elements = new Dictionary<Type, XElement>();
+        }
 
         /// <summary>
         /// Loads the data source and returns the root element.
@@ -28,7 +36,7 @@ namespace XmlRepository.DataProviders
         /// <returns>The root element.</returns>
         public XElement Load<TEntity>()
         {
-            lock (this._lock)
+            lock (this._lockObject)
             {
                 if (!this._elements.ContainsKey(typeof(TEntity)))
                 {
@@ -46,7 +54,7 @@ namespace XmlRepository.DataProviders
         /// <param name="rootElement">The root element.</param>
         public void Save<TEntity>(XElement rootElement)
         {
-            lock (this._lock)
+            lock (this._lockObject)
             {
                 if (!this._elements.ContainsKey(typeof(TEntity)))
                 {
@@ -82,9 +90,28 @@ namespace XmlRepository.DataProviders
         /// <returns>The cloned XElement.</returns>
         private XElement Clone(XElement source)
         {
-            var tempFile = Path.GetTempFileName();
-            source.Save(tempFile);
-            return XElement.Load(tempFile);
+            lock (this._lockObject)
+            {
+                XElement clonedElement = null;
+
+                using (var stream = new MemoryStream())
+                {
+                    using (var writer = new StreamWriter(stream))
+                    {
+                        source.Save(writer);
+                        writer.Flush();
+
+                        stream.Seek(0, SeekOrigin.Begin);
+
+                        using (var reader = new StreamReader(stream))
+                        {
+                            clonedElement = XElement.Load(reader);
+                        }
+                    }
+                }
+
+                return clonedElement;
+            }
         }
     }
 }
