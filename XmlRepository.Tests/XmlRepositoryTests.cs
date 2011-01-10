@@ -287,6 +287,23 @@ namespace XmlRepository.Tests
             }
         }
 
+        [Test]
+        public void RunningLinqQueriesReturnsAllMatchingEntities()
+        {
+            using (var repository = XmlRepository.GetInstance<Person>())
+            {
+                repository.SaveOnSubmit(new[] { this._peter, this._golo });
+                this.ExecuteLoadAsserts(repository, 2, true, true);
+            }
+
+            var firstName =
+                (from p in XmlRepository.GetInstance<Person>()
+                 where p.LastName == this._peter.LastName
+                 select p.FirstName).Single();
+
+            Assert.That(firstName, Is.EqualTo(this._peter.FirstName));
+        }
+
         private void ExecuteLoadAsserts(
             IXmlRepository<Person> repository,
             int totalNumberOfEntities,
