@@ -92,25 +92,7 @@ namespace XmlRepository.DataProviders
         {
             lock (this._lockObject)
             {
-                XElement clonedElement = null;
-
-                using (var stream = new MemoryStream())
-                {
-                    using (var writer = new StreamWriter(stream))
-                    {
-                        source.Save(writer);
-                        writer.Flush();
-
-                        stream.Seek(0, SeekOrigin.Begin);
-
-                        using (var reader = new StreamReader(stream))
-                        {
-                            clonedElement = XElement.Load(reader);
-                        }
-                    }
-                }
-
-                return clonedElement;
+                return XElement.Parse(source.ToString());
             }
         }
     }
