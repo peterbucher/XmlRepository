@@ -49,7 +49,7 @@ namespace XmlRepository
         public static IXmlDataProvider DataProvider
         {
             get;
-            set; 
+            set;
         }
 
         /// <summary>
@@ -139,6 +139,15 @@ namespace XmlRepository
                 this._defaultQueryPropertyInfo =
                     typeof(TEntity).GetProperty(this._defaultQueryProperty);
 
+                // Check whether the default query property was found.
+                if (this._defaultQueryPropertyInfo == null)
+                {
+                    throw new Exception(
+                        string.Format(
+                            "The property '{0}' has not been found on type '{1}' (is it missing, private, static or misspelled?)",
+                            this._defaultQueryProperty, typeof(TEntity).AssemblyQualifiedName));
+                }
+
                 // Set up the conversion methods.
                 this._toXElementFunction = XmlMappingBuilder<TEntity>.ToXElement();
                 this._toObjectFunction = XmlMappingBuilder<TEntity>.ToObject();
@@ -147,12 +156,12 @@ namespace XmlRepository
                 // data source.
                 XmlRepository.DataProvider.DataSourceChanged +=
                     (sender, eventArgs) =>
+                    {
+                        if (eventArgs.EntityType == typeof(TEntity).Name)
                         {
-                            if (eventArgs.EntityType == typeof(TEntity).Name)
-                            {
-                                this.DiscardChanges();
-                            }
-                        };
+                            this.DiscardChanges();
+                        }
+                    };
 
                 // Discard the in-memory representation of the data source, as it has not yet been
                 // loaded. This results in an initial load.
@@ -257,7 +266,7 @@ namespace XmlRepository
         /// <param name="entities">The entities.</param>
         public void SaveOnSubmit(IEnumerable<TEntity> entities)
         {
-            lock(this._lockObject)
+            lock (this._lockObject)
             {
                 foreach (var entity in entities)
                 {
@@ -275,8 +284,8 @@ namespace XmlRepository
             lock (this._lockObject)
             {
                 (from e in this._rootElement.Elements()
-                    where predicate(this._toObjectFunction(e))
-                    select e).Remove();
+                 where predicate(this._toObjectFunction(e))
+                 select e).Remove();
                 this._isDirty = true;
             }
         }
