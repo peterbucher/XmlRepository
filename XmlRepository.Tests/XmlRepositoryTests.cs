@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using NUnit.Framework;
+using XmlRepository.Contracts;
 using XmlRepository.DataProviders;
 using XmlRepository.Tests.Entities;
 using System.Collections.Generic;
@@ -10,117 +11,321 @@ namespace XmlRepository.Tests
     [TestFixture]
     public class XmlRepositoryTests
     {
-        [Test]
-        public void IntegrationTest()
+        private Person _peter;
+        private Person _golo;
+
+        [SetUp]
+        public void InitializeEntities()
         {
-            var peter =
-                new Person
-                {
-                    Id = Guid.NewGuid(),
-                    FirstName = "Peter",
-                    LastName = "Bucher",
-                    Birthday = new DateTime(1983, 10, 17)
-                };
-            var golo =
-                new Person
-                {
-                    Id = Guid.NewGuid(),
-                    FirstName = "Golo",
-                    LastName = "Roden",
-                    Birthday = new DateTime(1978, 9, 27)
-                };
+            this._peter = new Person
+                              {
+                                  Id = Guid.NewGuid(),
+                                  FirstName = "Peter",
+                                  LastName = "Bucher",
+                                  Birthday = new DateTime(1983, 10, 17)
+                              };
+            this._golo = new Person
+                             {
+                                 Id = Guid.NewGuid(),
+                                 FirstName = "Golo",
+                                 LastName = "Roden",
+                                 Birthday = new DateTime(1978, 9, 27)
+                             };
+        }
 
+        [TearDown]
+        public void DestroyEntities()
+        {
+            this._peter = null;
+            this._golo = null;
+        }
+
+        [SetUp]
+        public void InitializeDataProvider()
+        {
             XmlRepository.DataProvider = new XmlInMemoryProvider();
-            using(var firstRepository = XmlRepository.GetInstance<Person>())
+            using(var repository = XmlRepository.GetInstance<Person>())
             {
-                Assert.That(firstRepository.LoadAll().Count(), Is.EqualTo(0));
+                repository.DeleteAllOnSubmit();
+            }
+        }
 
-                var persons = new List<Person> { peter, golo };
-                firstRepository.SaveOnSubmit(persons);
-                Assert.That(firstRepository.LoadAll().Count(), Is.EqualTo(2));
-                
-                firstRepository.DiscardChanges();
-                Assert.That(firstRepository.LoadAll().Count(), Is.EqualTo(0));
+        [TearDown]
+        public void DestroyDataProvider()
+        {
+            XmlRepository.DataProvider = null;
+        }
 
-                firstRepository.SaveOnSubmit(persons);
-                firstRepository.SubmitChanges();
-                firstRepository.DiscardChanges();
+        [Test]
+        public void ANewlyCreatedRepositoryDoesNotContainAnyEntities()
+        {
+            using (var repository = XmlRepository.GetInstance<Person>())
+            {
+                this.ExecuteLoadAsserts(repository, 0, false, false);
+            }
+        }
 
-                Assert.That(firstRepository.LoadAll().Count(), Is.EqualTo(2));
+        [Test]
+        public void SaveOnSubmitAnEntitySavesTheEntity()
+        {
+            using (var repository = XmlRepository.GetInstance<Person>())
+            {
+                repository.SaveOnSubmit(this._peter);
+                this.ExecuteLoadAsserts(repository, 1, true, false);
+            }
+            this.ExecuteLoadAsserts(XmlRepository.GetInstance<Person>(), 1, true, false);
+        }
 
-                firstRepository.DeleteAllOnSubmit();
-                firstRepository.SubmitChanges();
-                Assert.That(() => firstRepository.LoadAll().Count(), Is.EqualTo(0));
+        [Test]
+        public void SaveOnSubmitUpdatesAnEntity()
+        {
+            using (var repository = XmlRepository.GetInstance<Person>())
+            {
+                repository.SaveOnSubmit(this._peter);
+                this.ExecuteLoadAsserts(repository, 1, true, false);
+                repository.SaveOnSubmit(this._peter);
+                this.ExecuteLoadAsserts(repository, 1, true, false);
+            }
+            this.ExecuteLoadAsserts(XmlRepository.GetInstance<Person>(), 1, true, false);
+        }
 
-                Assert.That(firstRepository.LoadAll().Count(), Is.EqualTo(0));
-                Assert.That(firstRepository.LoadAllBy(p => p.Id == Guid.Empty).Count(), Is.EqualTo(0));
-                Assert.That(firstRepository.LoadAllBy(p => p.Id == peter.Id).Count(), Is.EqualTo(0));
-                Assert.That(firstRepository.LoadAllBy(p => p.Id == golo.Id).Count(), Is.EqualTo(0));
-                Assert.That(() => firstRepository.LoadBy(p => p.Id == Guid.Empty), Throws.Exception);
-                Assert.That(() => firstRepository.LoadBy(p => p.Id == peter.Id), Throws.Exception);
-                Assert.That(() => firstRepository.LoadBy(p => p.Id == golo.Id), Throws.Exception);
+        [Test]
+        public void SaveOnSubmitMultipleEntitiesSavesTheEntities()
+        {
+            using (var repository = XmlRepository.GetInstance<Person>())
+            {
+                repository.SaveOnSubmit(new[] { this._peter, this._golo });
+                this.ExecuteLoadAsserts(repository, 2, true, true);
+            }
+            this.ExecuteLoadAsserts(XmlRepository.GetInstance<Person>(), 2, true, true);
+        }
 
-                firstRepository.SaveOnSubmit(peter);
+        [Test]
+        public void SaveOnSubmitNullThrowsArgumentNullException()
+        {
+            using (var repository = XmlRepository.GetInstance<Person>())
+            {
+                Assert.Throws<ArgumentNullException>(() => repository.SaveOnSubmit((Person)null));
+                Assert.Throws<ArgumentNullException>(() => repository.SaveOnSubmit((IEnumerable<Person>)null));
+            }
+        }
 
-                Assert.That(firstRepository.LoadAll().Count(), Is.EqualTo(1));
-                Assert.That(firstRepository.LoadAllBy(p => p.Id == Guid.Empty).Count(), Is.EqualTo(0));
-                Assert.That(firstRepository.LoadAllBy(p => p.Id == peter.Id).Count(), Is.EqualTo(1));
-                Assert.That(firstRepository.LoadAllBy(p => p.Id == golo.Id).Count(), Is.EqualTo(0));
-                Assert.That(() => firstRepository.LoadBy(p => p.Id == Guid.Empty), Throws.Exception);
-                Assert.That(firstRepository.LoadBy(p => p.Id == peter.Id).LastName, Is.EqualTo(peter.LastName));
-                Assert.That(() => firstRepository.LoadBy(p => p.Id == golo.Id), Throws.Exception);
+        [Test]
+        public void DiscardChangesRemovesNonSubmittedChanges()
+        {
+            using (var repository = XmlRepository.GetInstance<Person>())
+            {
+                repository.SaveOnSubmit(this._peter);
+                this.ExecuteLoadAsserts(repository, 1, true, false);
+                repository.SubmitChanges();
+                this.ExecuteLoadAsserts(repository, 1, true, false);
+                repository.SaveOnSubmit(this._golo);
+                this.ExecuteLoadAsserts(repository, 2, true, true);
+                repository.DiscardChanges();
+                this.ExecuteLoadAsserts(repository, 1, true, false);
+            }
+            this.ExecuteLoadAsserts(XmlRepository.GetInstance<Person>(), 1, true, false);
+        }
 
-                firstRepository.DiscardChanges();
+        [Test]
+        public void DeleteAllRemovesAllEntities()
+        {
+            using(var repository = XmlRepository.GetInstance<Person>())
+            {
+                repository.SaveOnSubmit(new[] { this._peter, this._golo });
+                this.ExecuteLoadAsserts(repository, 2, true, true);
+                repository.DeleteAllOnSubmit();
+                this.ExecuteLoadAsserts(repository, 0, false, false);
+            }
+            this.ExecuteLoadAsserts(XmlRepository.GetInstance<Person>(), 0, false, false);
+        }
 
-                Assert.That(firstRepository.LoadAll().Count(), Is.EqualTo(0));
-                Assert.That(firstRepository.LoadAllBy(p => p.Id == Guid.Empty).Count(), Is.EqualTo(0));
-                Assert.That(firstRepository.LoadAllBy(p => p.Id == peter.Id).Count(), Is.EqualTo(0));
-                Assert.That(firstRepository.LoadAllBy(p => p.Id == golo.Id).Count(), Is.EqualTo(0));
-                Assert.That(() => firstRepository.LoadBy(p => p.Id == Guid.Empty), Throws.Exception);
-                Assert.That(() => firstRepository.LoadBy(p => p.Id == peter.Id), Throws.Exception);
-                Assert.That(() => firstRepository.LoadBy(p => p.Id == golo.Id), Throws.Exception);
+        [Test]
+        public void DeleteOnSubmitNullThrowsArgumentNullException()
+        {
+            using (var repository = XmlRepository.GetInstance<Person>())
+            {
+                Assert.Throws<ArgumentNullException>(() => repository.DeleteOnSubmit(null));
+            }
+        }
 
-                firstRepository.SaveOnSubmit(peter);
+        [Test]
+        public void DeleteOnSubmitRemovesMatchingEntities()
+        {
+            using (var repository = XmlRepository.GetInstance<Person>())
+            {
+                repository.SaveOnSubmit(new[] { this._peter, this._golo });
+                this.ExecuteLoadAsserts(repository, 2, true, true);
+                repository.DeleteOnSubmit(p => p.LastName == this._golo.LastName);
+                this.ExecuteLoadAsserts(repository, 1, true, false);
+            }
+            this.ExecuteLoadAsserts(XmlRepository.GetInstance<Person>(), 1, true, false);
+        }
 
-                Assert.That(firstRepository.LoadAll().Count(), Is.EqualTo(1));
-                Assert.That(firstRepository.LoadAllBy(p => p.Id == Guid.Empty).Count(), Is.EqualTo(0));
-                Assert.That(firstRepository.LoadAllBy(p => p.Id == peter.Id).Count(), Is.EqualTo(1));
-                Assert.That(firstRepository.LoadAllBy(p => p.Id == golo.Id).Count(), Is.EqualTo(0));
-                Assert.That(() => firstRepository.LoadBy(p => p.Id == Guid.Empty), Throws.Exception);
-                Assert.That(firstRepository.LoadBy(p => p.Id == peter.Id).LastName, Is.EqualTo(peter.LastName));
-                Assert.That(() => firstRepository.LoadBy(p => p.Id == golo.Id), Throws.Exception);
+        [Test]
+        public void LoadAllReturnsAllEntities()
+        {
+            using (var repository = XmlRepository.GetInstance<Person>())
+            {
+                repository.SaveOnSubmit(new[] {this._peter, this._golo});
+                this.ExecuteLoadAsserts(repository, 2, true, true);
 
-                firstRepository.SubmitChanges();
+                var entities = repository.LoadAll();
+                Assert.That(entities.Count(), Is.EqualTo(2));
+            }
+        }
 
-                Assert.That(firstRepository.LoadAll().Count(), Is.EqualTo(1));
-                Assert.That(firstRepository.LoadAllBy(p => p.Id == Guid.Empty).Count(), Is.EqualTo(0));
-                Assert.That(firstRepository.LoadAllBy(p => p.Id == peter.Id).Count(), Is.EqualTo(1));
-                Assert.That(firstRepository.LoadAllBy(p => p.Id == golo.Id).Count(), Is.EqualTo(0));
-                Assert.That(() => firstRepository.LoadBy(p => p.Id == Guid.Empty), Throws.Exception);
-                Assert.That(firstRepository.LoadBy(p => p.Id == peter.Id).LastName, Is.EqualTo(peter.LastName));
-                Assert.That(() => firstRepository.LoadBy(p => p.Id == golo.Id), Throws.Exception);
+        [Test]
+        public void LoadAllByNullThrowsArgumentNullException()
+        {
+            using (var repository = XmlRepository.GetInstance<Person>())
+            {
+                Assert.Throws<ArgumentNullException>(() => repository.LoadAllBy(null));
+            }
+        }
 
-                firstRepository.DiscardChanges();
+        [Test]
+        public void LoadAllByReturnsEmptyCollectionWhenNoMatchingEntitiesWereFound()
+        {
+            using (var repository = XmlRepository.GetInstance<Person>())
+            {
+                repository.SaveOnSubmit(this._peter);
+                this.ExecuteLoadAsserts(repository, 1, true, false);
 
-                Assert.That(firstRepository.LoadAll().Count(), Is.EqualTo(1));
-                Assert.That(firstRepository.LoadAllBy(p => p.Id == Guid.Empty).Count(), Is.EqualTo(0));
-                Assert.That(firstRepository.LoadAllBy(p => p.Id == peter.Id).Count(), Is.EqualTo(1));
-                Assert.That(firstRepository.LoadAllBy(p => p.Id == golo.Id).Count(), Is.EqualTo(0));
-                Assert.That(() => firstRepository.LoadBy(p => p.Id == Guid.Empty), Throws.Exception);
-                Assert.That(firstRepository.LoadBy(p => p.Id == peter.Id).LastName, Is.EqualTo(peter.LastName));
-                Assert.That(() => firstRepository.LoadBy(p => p.Id == golo.Id), Throws.Exception);
+                var entities = repository.LoadAllBy(p => p.LastName == this._golo.LastName);
+                Assert.That(entities.Count(), Is.EqualTo(0));
+            }
+        }
 
-                firstRepository.SaveOnSubmit(golo);
+        [Test]
+        public void LoadAllByReturnsSingleMatchingEntityWhenOnlyOneEntityIsFound()
+        {
+            using (var repository = XmlRepository.GetInstance<Person>())
+            {
+                repository.SaveOnSubmit(new[] { this._peter, this._golo });
+                this.ExecuteLoadAsserts(repository, 2, true, true);
+
+                var singleEntity = repository.LoadAllBy(p => p.LastName == this._golo.LastName);
+                Assert.That(singleEntity.Count(), Is.EqualTo(1));
+            }
+        }
+
+        [Test]
+        public void LoadAllByReturnsMultipleMatchingEntitiesWhenMoreThanOneEntityWasFound()
+        {
+            using (var repository = XmlRepository.GetInstance<Person>())
+            {
+                repository.SaveOnSubmit(new[] { this._peter, this._golo });
+                this.ExecuteLoadAsserts(repository, 2, true, true);
+
+                var multipleEntities = repository.LoadAllBy(p => true);
+                Assert.That(multipleEntities.Count(), Is.EqualTo(2));
+            }
+        }
+
+        [Test]
+        public void LoadByNullThrowsArgumentNullException()
+        {
+            using (var repository = XmlRepository.GetInstance<Person>())
+            {
+                Assert.Throws<ArgumentNullException>(() => repository.LoadBy(null));
+            }
+        }
+
+        [Test]
+        public void LoadByThrowsExceptionWhenNoEntitiesWereFound()
+        {
+            using (var repository = XmlRepository.GetInstance<Person>())
+            {
+                repository.SaveOnSubmit(new[] { this._peter, this._golo });
+                this.ExecuteLoadAsserts(repository, 2, true, true);
+
+                Assert.Throws<InvalidOperationException>(() => repository.LoadBy(p => p.Id == Guid.Empty));
+            }
+        }
+
+        [Test]
+        public void LoadByReturnsSingleMatchingEntityWhenOnlyOneEntityWasFound()
+        {
+            using (var repository = XmlRepository.GetInstance<Person>())
+            {
+                repository.SaveOnSubmit(new[] { this._peter, this._golo });
+                this.ExecuteLoadAsserts(repository, 2, true, true);
+
+                var entities = repository.LoadBy(p => p.LastName == this._golo.LastName);
+                Assert.That(entities, Is.Not.Null);
+            }
+        }
+
+        [Test]
+        public void LoadByThrowsExceptionWhenMoreThanOneEntityWasFound()
+        {
+            using (var repository = XmlRepository.GetInstance<Person>())
+            {
+                repository.SaveOnSubmit(new[] { this._peter, this._golo });
+                this.ExecuteLoadAsserts(repository, 2, true, true);
+
+                Assert.Throws<InvalidOperationException>(() => repository.LoadBy(p => true));
+            }
+        }
+
+        [Test]
+        public void GetEnumeratorReturnsAnEnumerator()
+        {
+            using (var repository = XmlRepository.GetInstance<Person>())
+            {
+                repository.SaveOnSubmit(new[] {this._peter, this._golo});
+                this.ExecuteLoadAsserts(repository, 2, true, true);
+
+                int count = 0;
+                foreach(var person in repository)
+                {
+                    Assert.That(person.Id, Is.Not.EqualTo(Guid.Empty));
+                    count++;
+                }
+                Assert.That(count, Is.EqualTo(2));
+            }
+        }
+
+        [Test]
+        public void RunningLinqQueriesReturnsAllMatchingEntities()
+        {
+            using (var repository = XmlRepository.GetInstance<Person>())
+            {
+                repository.SaveOnSubmit(new[] { this._peter, this._golo });
+                this.ExecuteLoadAsserts(repository, 2, true, true);
             }
 
-            var secondRepository = XmlRepository.GetInstance<Person>();
-            Assert.That(secondRepository.LoadAll().Count(), Is.EqualTo(2));
-            Assert.That(secondRepository.LoadAllBy(p => p.Id == Guid.Empty).Count(), Is.EqualTo(0));
-            Assert.That(secondRepository.LoadAllBy(p => p.Id == peter.Id).Count(), Is.EqualTo(1));
-            Assert.That(secondRepository.LoadAllBy(p => p.Id == golo.Id).Count(), Is.EqualTo(1));
-            Assert.That(() => secondRepository.LoadBy(p => p.Id == Guid.Empty), Throws.Exception);
-            Assert.That(secondRepository.LoadBy(p => p.Id == peter.Id).LastName, Is.EqualTo(peter.LastName));
-            Assert.That(secondRepository.LoadBy(p => p.Id == golo.Id).LastName, Is.EqualTo(golo.LastName));
+            var firstName =
+                (from p in XmlRepository.GetInstance<Person>()
+                 where p.LastName == this._peter.LastName
+                 select p.FirstName).Single();
+
+            Assert.That(firstName, Is.EqualTo(this._peter.FirstName));
+        }
+
+        private void ExecuteLoadAsserts(
+            IXmlRepository<Person> repository,
+            int totalNumberOfEntities,
+            bool isPeterContained,
+            bool isGoloContained)
+        {
+            Assert.That(repository.LoadAll().Count(), Is.EqualTo(totalNumberOfEntities));
+
+            Assert.That(repository.LoadAllBy(p => p.Id == Guid.Empty).Count(), Is.EqualTo(0));
+            Assert.That(() => repository.LoadBy(p => p.Id == Guid.Empty), Throws.Exception);
+
+            Assert.That(repository.LoadAllBy(p => p.Id == this._peter.Id).Count(), Is.EqualTo(isPeterContained ? 1 : 0));
+            if (isPeterContained)
+                Assert.That(repository.LoadBy(p => p.Id == this._peter.Id).LastName, Is.EqualTo(this._peter.LastName));
+            else
+                Assert.That(() => repository.LoadBy(p => p.Id == this._peter.Id), Throws.Exception);
+
+            Assert.That(repository.LoadAllBy(p => p.Id == this._golo.Id).Count(), Is.EqualTo(isGoloContained ? 1 : 0));
+            if (isGoloContained)
+                Assert.That(repository.LoadBy(p => p.Id == this._golo.Id).LastName, Is.EqualTo(this._golo.LastName));
+            else
+                Assert.That(() => repository.LoadBy(p => p.Id == this._golo.Id), Throws.Exception);
         }
     }
 }

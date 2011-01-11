@@ -66,7 +66,10 @@
     <Folder Include="App_Data\" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Downloads\XmlRepository-201101091814.zip" />
+    <Content Include="Downloads\xmlrepository-v1.1-net35.zip" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Downloads\xmlrepository-v1.0-net35.zip" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v10.0\WebApplications\Microsoft.WebApplication.targets" />

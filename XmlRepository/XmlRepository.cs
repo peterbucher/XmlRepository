@@ -1,8 +1,10 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Xml.Linq;
+using cherryflavored.net;
 using XmlRepository.Contracts;
 using XmlRepository.DataProviders;
 
@@ -68,7 +70,7 @@ namespace XmlRepository
         /// </summary>
         /// <typeparam name="TEntity">The entity type.</typeparam>
         /// <returns>An xml repository.</returns>
-        public static IXmlRepository<TEntity> GetInstance<TEntity>()
+        public static IXmlRepository<TEntity> GetInstance<TEntity>() where TEntity: class, new()
         {
             lock (LockObject)
             {
@@ -88,7 +90,7 @@ namespace XmlRepository
     /// Represents an xml repository.
     /// </summary>
     /// <typeparam name="TEntity">The entity type.</typeparam>
-    internal class XmlRepository<TEntity> : IXmlRepository<TEntity>
+    internal class XmlRepository<TEntity> : IXmlRepository<TEntity> where TEntity: class, new()
     {
         /// <summary>
         /// Contains the lock object for instance locking.
@@ -242,6 +244,8 @@ namespace XmlRepository
         {
             lock (this._lockObject)
             {
+                Enforce.NotNull(entity, () => entity);
+
                 // Check whether the entity already exists. If so, remove it (and simulate an
                 // update this way).
                 var defaultQueryPropertyValue = _defaultQueryPropertyInfo.GetValue(entity, null);
@@ -268,6 +272,8 @@ namespace XmlRepository
         {
             lock (this._lockObject)
             {
+                Enforce.NotNull(entities, () => entities);
+
                 foreach (var entity in entities)
                 {
                     this.SaveOnSubmit(entity);
@@ -283,6 +289,8 @@ namespace XmlRepository
         {
             lock (this._lockObject)
             {
+                Enforce.NotNull(predicate, () => predicate);
+
                 (from e in this._rootElement.Elements()
                  where predicate(this._toObjectFunction(e))
                  select e).Remove();
@@ -340,6 +348,35 @@ namespace XmlRepository
             {
                 this.SubmitChanges();
             }
+        }
+
+        /// <summary>
+        /// Returns an enumerator that iterates through the collection.
+        /// </summary>
+        /// <returns>
+        /// A <see cref="T:System.Collections.Generic.IEnumerator`1"/> that can be used to iterate through the collection.
+        /// </returns>
+        /// <filterpriority>1</filterpriority>
+        public IEnumerator<TEntity> GetEnumerator()
+        {
+            lock (this._lockObject)
+            {
+                return
+                    (from e in this._rootElement.Elements()
+                     select this._toObjectFunction(e)).GetEnumerator();
+            }
+        }
+
+        /// <summary>
+        /// Returns an enumerator that iterates through a collection.
+        /// </summary>
+        /// <returns>
+        /// An <see cref="T:System.Collections.IEnumerator"/> object that can be used to iterate through the collection.
+        /// </returns>
+        /// <filterpriority>2</filterpriority>
+        IEnumerator IEnumerable.GetEnumerator()
+        {
+            return GetEnumerator();
         }
     }
 }
