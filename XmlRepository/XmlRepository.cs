@@ -7,6 +7,7 @@ using System.Xml.Linq;
 using cherryflavored.net;
 using XmlRepository.Contracts;
 using XmlRepository.DataProviders;
+using XmlRepository.DataSerializers;
 
 namespace XmlRepository
 {
@@ -44,11 +45,20 @@ namespace XmlRepository
         }
 
         /// <summary>
-        /// Gets or sets the data provider that is being used to access XML data sources. If not
-        /// set, the XmlFileProvider is being used with the current folder as data folder.
+        /// Gets or sets the data serializer. If not set, the XmlDataSerializer is being used.
+        /// </summary>
+        public static IDataSerializer DataSerializer
+        {
+            get;
+            set;
+        }
+
+        /// <summary>
+        /// Gets or sets the data provider that is being used to access the data sources. If not
+        /// set, the FileProvider is being used with the current folder as data folder.
         /// </summary>
         /// <value>The data provider.</value>
-        public static IXmlDataProvider DataProvider
+        public static IDataProvider DataProvider
         {
             get;
             set;
@@ -60,7 +70,8 @@ namespace XmlRepository
         static XmlRepository()
         {
             Repositories = new Dictionary<Type, IXmlRepository>();
-            DataProvider = new XmlFileProvider(Environment.CurrentDirectory);
+            DataSerializer = new XmlDataSerializer();
+            DataProvider = new FileDataProvider(Environment.CurrentDirectory, ".xml");
             DefaultQueryProperty = "Id";
         }
 
@@ -322,7 +333,9 @@ namespace XmlRepository
                     return;
                 }
 
-                XmlRepository.DataProvider.Save<TEntity>(this._rootElement);
+                XmlRepository.DataProvider.Save<TEntity>(
+                    XmlRepository.DataSerializer.Serialize(
+                        this._rootElement));
                 this._isDirty = false;
             }
         }
@@ -334,7 +347,9 @@ namespace XmlRepository
         {
             lock (this._lockObject)
             {
-                this._rootElement = XmlRepository.DataProvider.Load<TEntity>();
+                this._rootElement =
+                    XmlRepository.DataSerializer.Deserialize(
+                        XmlRepository.DataProvider.Load<TEntity>());
                 this._isDirty = false;
             }
         }

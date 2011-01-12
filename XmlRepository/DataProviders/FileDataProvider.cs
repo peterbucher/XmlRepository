@@ -1,14 +1,13 @@
 ﻿using System;
 using System.IO;
-using System.Xml.Linq;
 using XmlRepository.Contracts;
 
 namespace XmlRepository.DataProviders
 {
     /// <summary>
-    /// Provides access to an XML file data source.
+    /// Provides access to a file data source.
     /// </summary>
-    public class XmlFileProvider : IXmlDataProvider
+    public class FileDataProvider : IDataProvider
     {
         private readonly object _lockObject = new object();
 
@@ -19,13 +18,15 @@ namespace XmlRepository.DataProviders
         private readonly string _dataFileExtension;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="XmlFileProvider" /> type.
+        /// Initializes a new instance of the <see cref="FileDataProvider" /> type.
         /// </summary>
         /// <param name="dataPath">The data path.</param>
-        public XmlFileProvider(string dataPath)
+        /// <param name="dataFileExtension">The data file extension (including the leading dot).</param>
+        public FileDataProvider(string dataPath, string dataFileExtension)
         {
             this._dataPath = dataPath;
-            this._dataFileExtension = ".xml";
+            this._dataFileExtension =
+                dataFileExtension.StartsWith(".") ? dataFileExtension : string.Concat(".", dataFileExtension);
 
             this._fileSystemWatcher = new FileSystemWatcher(this._dataPath, String.Concat("*", this._dataFileExtension));
             this._fileSystemWatcher.Changed += (sender, eventArgs) => OnDataSourceChanged(eventArgs.Name);
@@ -33,33 +34,28 @@ namespace XmlRepository.DataProviders
         }
 
         /// <summary>
-        /// Loads the data source and returns the root element.
+        /// Loads the data source and returns its content.
         /// </summary>
+        /// <typeparam name="TEntity">The entity type that shall be loaded.</typeparam>
         /// <returns>The root element.</returns>
-        public XElement Load<TEntity>()
+        public string Load<TEntity>()
         {
-            lock (this._lockObject)
+            lock(this._lockObject)
             {
-                var dataFile = this.GetDataFile<TEntity>();
-                if (!File.Exists(dataFile))
-                {
-                    this.Save<TEntity>(new XElement(XmlRepository.RootElementName));
-                }
-
-                return XElement.Load(dataFile);
+                return File.ReadAllText(this.GetDataFile<TEntity>());
             }
         }
 
         /// <summary>
-        /// Saves the root element and all descending elements to the data source.
+        /// Saves the given content to the data source.
         /// </summary>
-        /// <typeparam name="TEntity">The entity type that shall be saved.</typeparam>
-        /// <param name="rootElement">The root element.</param>
-        public void Save<TEntity>(XElement rootElement)
+        /// <typeparam name="TEntity">The entity type that shall be loaded.</typeparam>
+        /// <param name="content">The content.</param>
+        public void Save<TEntity>(string content)
         {
             lock (this._lockObject)
             {
-                rootElement.Save(this.GetDataFile<TEntity>());
+                File.WriteAllText(this.GetDataFile<TEntity>(), content);
             }
         }
 

@@ -1,26 +1,25 @@
 ﻿using System;
-using System.Xml.Linq;
 
 namespace XmlRepository.Contracts
 {
     /// <summary>
-    /// Provides access to XML data sources.
+    /// Provides access to a data sources.
     /// </summary>
-    public interface IXmlDataProvider
+    public interface IDataProvider
     {
         /// <summary>
-        /// Loads the data source and returns the root element.
+        /// Loads the data source and returns its content.
         /// </summary>
         /// <typeparam name="TEntity">The entity type that shall be loaded.</typeparam>
         /// <returns>The root element.</returns>
-        XElement Load<TEntity>();
+        string Load<TEntity>();
 
         /// <summary>
-        /// Saves the root element and all descending elements to the data source.
+        /// Saves the given content to the data source.
         /// </summary>
-        /// <typeparam name="TEntity">The entity type that shall be saved.</typeparam>
-        /// <param name="rootElement">The root element.</param>
-        void Save<TEntity>(XElement rootElement);
+        /// <typeparam name="TEntity">The entity type that shall be loaded.</typeparam>
+        /// <param name="content">The content.</param>
+        void Save<TEntity>(string content);
 
         /// <summary>
         /// Raised when the underlying data source was changed.

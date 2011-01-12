@@ -3,6 +3,7 @@ using System.Linq;
 using NUnit.Framework;
 using XmlRepository.Contracts;
 using XmlRepository.DataProviders;
+using XmlRepository.DataSerializers;
 using XmlRepository.Tests.Entities;
 using System.Collections.Generic;
 
@@ -43,7 +44,8 @@ namespace XmlRepository.Tests
         [SetUp]
         public void InitializeDataProvider()
         {
-            XmlRepository.DataProvider = new XmlInMemoryProvider();
+            XmlRepository.DataSerializer = new XmlDataSerializer();
+            XmlRepository.DataProvider = new InMemoryDataProvider();
             using(var repository = XmlRepository.GetInstance<Person>())
             {
                 repository.DeleteAllOnSubmit();
@@ -53,6 +55,7 @@ namespace XmlRepository.Tests
         [TearDown]
         public void DestroyDataProvider()
         {
+            XmlRepository.DataSerializer = null;
             XmlRepository.DataProvider = null;
         }
 
