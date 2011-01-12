@@ -103,7 +103,7 @@ namespace XmlRepository
     /// </summary>
     /// <typeparam name="TEntity">The entity type.</typeparam>
     /// <typeparam name="TIdentity">The identity type.</typeparam>
-    internal class XmlRepository<TEntity, TIdentity> : IXmlRepository<TEntity, TIdentity> where TEntity: class, new()
+    internal class XmlRepository<TEntity, TIdentity> : IXmlRepository<TEntity, TIdentity> where TEntity : class, new()
     {
         /// <summary>
         /// Contains the lock object for instance locking.
@@ -212,10 +212,17 @@ namespace XmlRepository
         /// </returns>
         public TEntity LoadBy(TIdentity identity)
         {
-            lock(this._lockObject)
+            lock (this._lockObject)
             {
-                return this._toObjectFunction(
-                    this.GetElementsByKeyValuePair(this._defaultQueryProperty, identity).Single());
+                try
+                {
+                    return this._toObjectFunction(
+                        this.GetElementsByKeyValuePair(this._defaultQueryProperty, identity).Single());
+                }
+                catch (InvalidOperationException e)
+                {
+                    throw new EntityNotFoundException(null, e);
+                }
             }
         }
 
@@ -230,7 +237,18 @@ namespace XmlRepository
         {
             lock (this._lockObject)
             {
-                return this.LoadAll().Where(predicate).Single();
+                var entities = this.LoadAll().Where(predicate);
+                try
+                {
+                    return entities.Single();
+                }
+                catch (InvalidOperationException e)
+                {
+                    if (!entities.Any())
+                        throw new EntityNotFoundException(null, e);
+                    else
+                        throw;
+                }
             }
         }
 
@@ -316,7 +334,14 @@ namespace XmlRepository
         /// <param name="identity">The identity.</param>
         public void DeleteOnSubmit(TIdentity identity)
         {
-            (this.GetElementsByKeyValuePair(this._defaultQueryProperty, identity)).Remove();
+            try
+            {
+                (this.GetElementsByKeyValuePair(this._defaultQueryProperty, identity)).Remove();
+            }
+            catch (InvalidOperationException e)
+            {
+                throw new EntityNotFoundException(null, e);
+            }
             this._isDirty = true;
         }
 

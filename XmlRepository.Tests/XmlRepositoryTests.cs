@@ -179,6 +179,18 @@ namespace XmlRepository.Tests
         }
 
         [Test]
+        public void DeleteOnSubmitWithIdentityThrowsExceptionWhenNoEntityWasFound()
+        {
+            using (var repository = XmlRepository.Get(RepositoryFor<Person>.WithIdentity(p => p.Id)))
+            {
+                repository.SaveOnSubmit(this._peter);
+                this.ExecuteLoadAsserts(repository, 1, true, false);
+
+                Assert.Throws<EntityNotFoundException>(() => repository.LoadBy(this._golo.Id));
+            }
+        }
+
+        [Test]
         public void LoadAllReturnsAllEntities()
         {
             using (var repository = XmlRepository.Get(RepositoryFor<Person>.WithIdentity(p => p.Id)))
@@ -256,7 +268,7 @@ namespace XmlRepository.Tests
                 repository.SaveOnSubmit(new[] { this._peter, this._golo });
                 this.ExecuteLoadAsserts(repository, 2, true, true);
 
-                Assert.Throws<InvalidOperationException>(() => repository.LoadBy(p => p.Id == Guid.Empty));
+                Assert.Throws<EntityNotFoundException>(() => repository.LoadBy(p => p.Id == Guid.Empty));
             }
         }
 
@@ -293,7 +305,7 @@ namespace XmlRepository.Tests
                 repository.SaveOnSubmit(new[] { this._peter, this._golo });
                 this.ExecuteLoadAsserts(repository, 2, true, true);
 
-                Assert.Throws<InvalidOperationException>(() => repository.LoadBy(Guid.Empty));
+                Assert.Throws<EntityNotFoundException>(() => repository.LoadBy(Guid.Empty));
             }
         }
 
