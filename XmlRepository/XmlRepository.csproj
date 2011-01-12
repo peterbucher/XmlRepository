@@ -61,6 +61,9 @@
     <Reference Include="cherryflavored.net">
       <HintPath>..\Referenced DLLs\cherryflavored.net\cherryflavored.net.dll</HintPath>
     </Reference>
+    <Reference Include="Newtonsoft.Json.Net35">
+      <HintPath>..\Referenced DLLs\Json.Net\Newtonsoft.Json.Net35.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core">
       <RequiredTargetFramework>3.5</RequiredTargetFramework>
@@ -72,6 +75,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="DataProviders\InMemoryDataProvider.cs" />
+    <Compile Include="DataSerializers\JsonDataSerializer.cs" />
     <Compile Include="DataSerializers\XmlDataSerializer.cs" />
     <Compile Include="EntityNotFoundException.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

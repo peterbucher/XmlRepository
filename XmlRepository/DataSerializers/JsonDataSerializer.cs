@@ -1,4 +1,5 @@
 ﻿using System.Xml.Linq;
+using Newtonsoft.Json;
 using XmlRepository.Contracts.DataSerializers;
 
 namespace XmlRepository.DataSerializers
@@ -6,13 +7,8 @@ namespace XmlRepository.DataSerializers
     /// <summary>
     /// Serializes or deserializes an XElement to the appropriate format.
     /// </summary>
-    public class XmlDataSerializer : IDataSerializer
+    public class JsonDataSerializer : IDataSerializer
     {
-        /// <summary>
-        /// Contains the lock object.
-        /// </summary>
-        private readonly object _lockObject = new object();
-
         /// <summary>
         /// Serializes the given root element.
         /// </summary>
@@ -20,10 +16,7 @@ namespace XmlRepository.DataSerializers
         /// <returns>The serialized string representation.</returns>
         public string Serialize(XElement rootElement)
         {
-            lock (this._lockObject)
-            {
-                return rootElement.ToString();
-            }
+            return JsonConvert.SerializeXNode(rootElement);
         }
 
         /// <summary>
@@ -33,10 +26,7 @@ namespace XmlRepository.DataSerializers
         /// <returns>An XElement.</returns>
         public XElement Deserialize(string content)
         {
-            lock (this._lockObject)
-            {
-                return XElement.Parse(content);
-            }
+            return JsonConvert.DeserializeXNode(content, XmlRepository.RootElementName).Root;
         }
     }
 }

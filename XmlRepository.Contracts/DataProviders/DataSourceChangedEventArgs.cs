@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace XmlRepository.Contracts
+namespace XmlRepository.Contracts.DataProviders
 {
     /// <summary>
     /// Represents the event argumemts when an XML data source was changed.
