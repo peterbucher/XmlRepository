@@ -76,6 +76,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="DataProviders\FileDataProvider.cs" />
     <Compile Include="RepositoryFor.cs" />
+    <Compile Include="RepositorySelector.cs" />
     <Compile Include="XmlMappingBuilder.cs" />
     <Compile Include="XmlRepository.cs" />
   </ItemGroup>

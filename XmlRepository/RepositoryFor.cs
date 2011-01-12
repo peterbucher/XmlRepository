@@ -1,4 +1,5 @@
 ﻿using System;
+using XmlRepository.Contracts;
 
 namespace XmlRepository
 {
@@ -14,9 +15,9 @@ namespace XmlRepository
         /// <typeparam name="TIdentity">The identity type.</typeparam>
         /// <param name="identitySelector">The identity selector.</param>
         /// <returns>The identity selector.</returns>
-        public static Func<TEntity, TIdentity> WithIdentity<TIdentity>(Func<TEntity, TIdentity> identitySelector)
+        public static IRepositorySelector<TEntity,TIdentity> WithIdentity<TIdentity>(Func<TEntity, TIdentity> identitySelector)
         {
-            return identitySelector;
+            return new RepositorySelector<TEntity, TIdentity>();
         }
     }
 }

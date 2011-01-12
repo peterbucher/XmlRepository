@@ -43,6 +43,7 @@
     <Compile Include="DataSourceChangedEventArgs.cs" />
     <Compile Include="IDataProvider.cs" />
     <Compile Include="IDataSerializer.cs" />
+    <Compile Include="IRepositorySelector.cs" />
     <Compile Include="IXmlRepository.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

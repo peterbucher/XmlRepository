@@ -82,7 +82,7 @@ namespace XmlRepository
         /// <typeparam name="TEntity">The entity type.</typeparam>
         /// <typeparam name="TIdentity">The identity type.</typeparam>
         /// <returns>An xml repository.</returns>
-        public static IXmlRepository<TEntity, TIdentity> Get<TEntity, TIdentity>(Func<TEntity, TIdentity> repositorySelector) where TEntity : class, new()
+        public static IXmlRepository<TEntity, TIdentity> Get<TEntity, TIdentity>(IRepositorySelector<TEntity, TIdentity> repositorySelector) where TEntity : class, new()
         {
             lock (LockObject)
             {
