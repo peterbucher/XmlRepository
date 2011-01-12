@@ -18,6 +18,15 @@ namespace XmlRepository.Contracts
     public interface IXmlRepository<TEntity, TIdentity> : IXmlRepository, IEnumerable<TEntity> where TEntity: class, new()
     {
         /// <summary>
+        /// Loads the entity with the given identity.
+        /// </summary>
+        /// <param name="identity">The identity.</param>
+        /// <returns>
+        /// The entity, if an entity was found. Otherwise, an exception is thrown.
+        /// </returns>
+        TEntity LoadBy(TIdentity identity);
+
+        /// <summary>
         /// Loads the entity that matches the given predicate.
         /// </summary>
         /// <param name="predicate">The predicate.</param>
@@ -54,6 +63,12 @@ namespace XmlRepository.Contracts
         /// </summary>
         /// <param name="entities">The entities.</param>
         void SaveOnSubmit(IEnumerable<TEntity> entities);
+
+        /// <summary>
+        /// Deletes the entity with the given identity.
+        /// </summary>
+        /// <param name="identity">The identity.</param>
+        void DeleteOnSubmit(TIdentity identity);
 
         /// <summary>
         /// Deletes the entities that match given predicate.

@@ -204,6 +204,22 @@ namespace XmlRepository
         }
 
         /// <summary>
+        /// Loads the entity with the given identity.
+        /// </summary>
+        /// <param name="identity">The identity.</param>
+        /// <returns>
+        /// The entity, if an entity was found. Otherwise, an exception is thrown.
+        /// </returns>
+        public TEntity LoadBy(TIdentity identity)
+        {
+            lock(this._lockObject)
+            {
+                return this._toObjectFunction(
+                    this.GetElementsByKeyValuePair(this._defaultQueryProperty, identity).Single());
+            }
+        }
+
+        /// <summary>
         /// Loads the entity that matches the given predicate.
         /// </summary>
         /// <param name="predicate">The predicate.</param>
@@ -214,7 +230,7 @@ namespace XmlRepository
         {
             lock (this._lockObject)
             {
-                return LoadAll().Where(predicate).Single();
+                return this.LoadAll().Where(predicate).Single();
             }
         }
 
@@ -292,6 +308,16 @@ namespace XmlRepository
                     this.SaveOnSubmit(entity);
                 }
             }
+        }
+
+        /// <summary>
+        /// Deletes the entity with the given identity.
+        /// </summary>
+        /// <param name="identity">The identity.</param>
+        public void DeleteOnSubmit(TIdentity identity)
+        {
+            (this.GetElementsByKeyValuePair(this._defaultQueryProperty, identity)).Remove();
+            this._isDirty = true;
         }
 
         /// <summary>
