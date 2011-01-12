@@ -80,19 +80,20 @@ namespace XmlRepository
         /// created yet, a new one is created; otherwise, the existing one is returned.
         /// </summary>
         /// <typeparam name="TEntity">The entity type.</typeparam>
+        /// <typeparam name="TIdentity">The identity type.</typeparam>
         /// <returns>An xml repository.</returns>
-        public static IXmlRepository<TEntity> GetInstance<TEntity>() where TEntity: class, new()
+        public static IXmlRepository<TEntity, TIdentity> Get<TEntity, TIdentity>(Func<TEntity, TIdentity> repositorySelector) where TEntity : class, new()
         {
             lock (LockObject)
             {
                 // If the repository does not yet exist, create it.
                 if (!Repositories.ContainsKey(typeof(TEntity)))
                 {
-                    Repositories.Add(typeof(TEntity), new XmlRepository<TEntity>());
+                    Repositories.Add(typeof(TEntity), new XmlRepository<TEntity, TIdentity>());
                 }
 
                 // Return the requested repository to the caller.
-                return Repositories[typeof(TEntity)] as IXmlRepository<TEntity>;
+                return Repositories[typeof(TEntity)] as IXmlRepository<TEntity, TIdentity>;
             }
         }
     }
@@ -101,7 +102,8 @@ namespace XmlRepository
     /// Represents an xml repository.
     /// </summary>
     /// <typeparam name="TEntity">The entity type.</typeparam>
-    internal class XmlRepository<TEntity> : IXmlRepository<TEntity> where TEntity: class, new()
+    /// <typeparam name="TIdentity">The identity type.</typeparam>
+    internal class XmlRepository<TEntity, TIdentity> : IXmlRepository<TEntity, TIdentity> where TEntity: class, new()
     {
         /// <summary>
         /// Contains the lock object for instance locking.

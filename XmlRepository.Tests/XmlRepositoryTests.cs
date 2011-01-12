@@ -46,7 +46,7 @@ namespace XmlRepository.Tests
         {
             XmlRepository.DataSerializer = new XmlDataSerializer();
             XmlRepository.DataProvider = new InMemoryDataProvider();
-            using(var repository = XmlRepository.GetInstance<Person>())
+            using(var repository = XmlRepository.Get(RepositoryFor<Person>.WithIdentity(p => p.Id)))
             {
                 repository.DeleteAllOnSubmit();
             }
@@ -62,7 +62,7 @@ namespace XmlRepository.Tests
         [Test]
         public void ANewlyCreatedRepositoryDoesNotContainAnyEntities()
         {
-            using (var repository = XmlRepository.GetInstance<Person>())
+            using (var repository = XmlRepository.Get(RepositoryFor<Person>.WithIdentity(p => p.Id)))
             {
                 this.ExecuteLoadAsserts(repository, 0, false, false);
             }
@@ -71,42 +71,42 @@ namespace XmlRepository.Tests
         [Test]
         public void SaveOnSubmitAnEntitySavesTheEntity()
         {
-            using (var repository = XmlRepository.GetInstance<Person>())
+            using (var repository = XmlRepository.Get(RepositoryFor<Person>.WithIdentity(p => p.Id)))
             {
                 repository.SaveOnSubmit(this._peter);
                 this.ExecuteLoadAsserts(repository, 1, true, false);
             }
-            this.ExecuteLoadAsserts(XmlRepository.GetInstance<Person>(), 1, true, false);
+            this.ExecuteLoadAsserts(XmlRepository.Get(RepositoryFor<Person>.WithIdentity(p => p.Id)), 1, true, false);
         }
 
         [Test]
         public void SaveOnSubmitUpdatesAnEntity()
         {
-            using (var repository = XmlRepository.GetInstance<Person>())
+            using (var repository = XmlRepository.Get(RepositoryFor<Person>.WithIdentity(p => p.Id)))
             {
                 repository.SaveOnSubmit(this._peter);
                 this.ExecuteLoadAsserts(repository, 1, true, false);
                 repository.SaveOnSubmit(this._peter);
                 this.ExecuteLoadAsserts(repository, 1, true, false);
             }
-            this.ExecuteLoadAsserts(XmlRepository.GetInstance<Person>(), 1, true, false);
+            this.ExecuteLoadAsserts(XmlRepository.Get(RepositoryFor<Person>.WithIdentity(p => p.Id)), 1, true, false);
         }
 
         [Test]
         public void SaveOnSubmitMultipleEntitiesSavesTheEntities()
         {
-            using (var repository = XmlRepository.GetInstance<Person>())
+            using (var repository = XmlRepository.Get(RepositoryFor<Person>.WithIdentity(p => p.Id)))
             {
                 repository.SaveOnSubmit(new[] { this._peter, this._golo });
                 this.ExecuteLoadAsserts(repository, 2, true, true);
             }
-            this.ExecuteLoadAsserts(XmlRepository.GetInstance<Person>(), 2, true, true);
+            this.ExecuteLoadAsserts(XmlRepository.Get(RepositoryFor<Person>.WithIdentity(p => p.Id)), 2, true, true);
         }
 
         [Test]
         public void SaveOnSubmitNullThrowsArgumentNullException()
         {
-            using (var repository = XmlRepository.GetInstance<Person>())
+            using (var repository = XmlRepository.Get(RepositoryFor<Person>.WithIdentity(p => p.Id)))
             {
                 Assert.Throws<ArgumentNullException>(() => repository.SaveOnSubmit((Person)null));
                 Assert.Throws<ArgumentNullException>(() => repository.SaveOnSubmit((IEnumerable<Person>)null));
@@ -116,7 +116,7 @@ namespace XmlRepository.Tests
         [Test]
         public void DiscardChangesRemovesNonSubmittedChanges()
         {
-            using (var repository = XmlRepository.GetInstance<Person>())
+            using (var repository = XmlRepository.Get(RepositoryFor<Person>.WithIdentity(p => p.Id)))
             {
                 repository.SaveOnSubmit(this._peter);
                 this.ExecuteLoadAsserts(repository, 1, true, false);
@@ -127,26 +127,26 @@ namespace XmlRepository.Tests
                 repository.DiscardChanges();
                 this.ExecuteLoadAsserts(repository, 1, true, false);
             }
-            this.ExecuteLoadAsserts(XmlRepository.GetInstance<Person>(), 1, true, false);
+            this.ExecuteLoadAsserts(XmlRepository.Get(RepositoryFor<Person>.WithIdentity(p => p.Id)), 1, true, false);
         }
 
         [Test]
         public void DeleteAllRemovesAllEntities()
         {
-            using(var repository = XmlRepository.GetInstance<Person>())
+            using (var repository = XmlRepository.Get(RepositoryFor<Person>.WithIdentity(p => p.Id)))
             {
                 repository.SaveOnSubmit(new[] { this._peter, this._golo });
                 this.ExecuteLoadAsserts(repository, 2, true, true);
                 repository.DeleteAllOnSubmit();
                 this.ExecuteLoadAsserts(repository, 0, false, false);
             }
-            this.ExecuteLoadAsserts(XmlRepository.GetInstance<Person>(), 0, false, false);
+            this.ExecuteLoadAsserts(XmlRepository.Get(RepositoryFor<Person>.WithIdentity(p => p.Id)), 0, false, false);
         }
 
         [Test]
         public void DeleteOnSubmitNullThrowsArgumentNullException()
         {
-            using (var repository = XmlRepository.GetInstance<Person>())
+            using (var repository = XmlRepository.Get(RepositoryFor<Person>.WithIdentity(p => p.Id)))
             {
                 Assert.Throws<ArgumentNullException>(() => repository.DeleteOnSubmit(null));
             }
@@ -155,20 +155,20 @@ namespace XmlRepository.Tests
         [Test]
         public void DeleteOnSubmitRemovesMatchingEntities()
         {
-            using (var repository = XmlRepository.GetInstance<Person>())
+            using (var repository = XmlRepository.Get(RepositoryFor<Person>.WithIdentity(p => p.Id)))
             {
                 repository.SaveOnSubmit(new[] { this._peter, this._golo });
                 this.ExecuteLoadAsserts(repository, 2, true, true);
                 repository.DeleteOnSubmit(p => p.LastName == this._golo.LastName);
                 this.ExecuteLoadAsserts(repository, 1, true, false);
             }
-            this.ExecuteLoadAsserts(XmlRepository.GetInstance<Person>(), 1, true, false);
+            this.ExecuteLoadAsserts(XmlRepository.Get(RepositoryFor<Person>.WithIdentity(p => p.Id)), 1, true, false);
         }
 
         [Test]
         public void LoadAllReturnsAllEntities()
         {
-            using (var repository = XmlRepository.GetInstance<Person>())
+            using (var repository = XmlRepository.Get(RepositoryFor<Person>.WithIdentity(p => p.Id)))
             {
                 repository.SaveOnSubmit(new[] {this._peter, this._golo});
                 this.ExecuteLoadAsserts(repository, 2, true, true);
@@ -181,7 +181,7 @@ namespace XmlRepository.Tests
         [Test]
         public void LoadAllByNullThrowsArgumentNullException()
         {
-            using (var repository = XmlRepository.GetInstance<Person>())
+            using (var repository = XmlRepository.Get(RepositoryFor<Person>.WithIdentity(p => p.Id)))
             {
                 Assert.Throws<ArgumentNullException>(() => repository.LoadAllBy(null));
             }
@@ -190,7 +190,7 @@ namespace XmlRepository.Tests
         [Test]
         public void LoadAllByReturnsEmptyCollectionWhenNoMatchingEntitiesWereFound()
         {
-            using (var repository = XmlRepository.GetInstance<Person>())
+            using (var repository = XmlRepository.Get(RepositoryFor<Person>.WithIdentity(p => p.Id)))
             {
                 repository.SaveOnSubmit(this._peter);
                 this.ExecuteLoadAsserts(repository, 1, true, false);
@@ -203,7 +203,7 @@ namespace XmlRepository.Tests
         [Test]
         public void LoadAllByReturnsSingleMatchingEntityWhenOnlyOneEntityIsFound()
         {
-            using (var repository = XmlRepository.GetInstance<Person>())
+            using (var repository = XmlRepository.Get(RepositoryFor<Person>.WithIdentity(p => p.Id)))
             {
                 repository.SaveOnSubmit(new[] { this._peter, this._golo });
                 this.ExecuteLoadAsserts(repository, 2, true, true);
@@ -216,7 +216,7 @@ namespace XmlRepository.Tests
         [Test]
         public void LoadAllByReturnsMultipleMatchingEntitiesWhenMoreThanOneEntityWasFound()
         {
-            using (var repository = XmlRepository.GetInstance<Person>())
+            using (var repository = XmlRepository.Get(RepositoryFor<Person>.WithIdentity(p => p.Id)))
             {
                 repository.SaveOnSubmit(new[] { this._peter, this._golo });
                 this.ExecuteLoadAsserts(repository, 2, true, true);
@@ -229,7 +229,7 @@ namespace XmlRepository.Tests
         [Test]
         public void LoadByNullThrowsArgumentNullException()
         {
-            using (var repository = XmlRepository.GetInstance<Person>())
+            using (var repository = XmlRepository.Get(RepositoryFor<Person>.WithIdentity(p => p.Id)))
             {
                 Assert.Throws<ArgumentNullException>(() => repository.LoadBy(null));
             }
@@ -238,7 +238,7 @@ namespace XmlRepository.Tests
         [Test]
         public void LoadByThrowsExceptionWhenNoEntitiesWereFound()
         {
-            using (var repository = XmlRepository.GetInstance<Person>())
+            using (var repository = XmlRepository.Get(RepositoryFor<Person>.WithIdentity(p => p.Id)))
             {
                 repository.SaveOnSubmit(new[] { this._peter, this._golo });
                 this.ExecuteLoadAsserts(repository, 2, true, true);
@@ -250,7 +250,7 @@ namespace XmlRepository.Tests
         [Test]
         public void LoadByReturnsSingleMatchingEntityWhenOnlyOneEntityWasFound()
         {
-            using (var repository = XmlRepository.GetInstance<Person>())
+            using (var repository = XmlRepository.Get(RepositoryFor<Person>.WithIdentity(p => p.Id)))
             {
                 repository.SaveOnSubmit(new[] { this._peter, this._golo });
                 this.ExecuteLoadAsserts(repository, 2, true, true);
@@ -263,7 +263,7 @@ namespace XmlRepository.Tests
         [Test]
         public void LoadByThrowsExceptionWhenMoreThanOneEntityWasFound()
         {
-            using (var repository = XmlRepository.GetInstance<Person>())
+            using (var repository = XmlRepository.Get(RepositoryFor<Person>.WithIdentity(p => p.Id)))
             {
                 repository.SaveOnSubmit(new[] { this._peter, this._golo });
                 this.ExecuteLoadAsserts(repository, 2, true, true);
@@ -275,7 +275,7 @@ namespace XmlRepository.Tests
         [Test]
         public void GetEnumeratorReturnsAnEnumerator()
         {
-            using (var repository = XmlRepository.GetInstance<Person>())
+            using (var repository = XmlRepository.Get(RepositoryFor<Person>.WithIdentity(p => p.Id)))
             {
                 repository.SaveOnSubmit(new[] {this._peter, this._golo});
                 this.ExecuteLoadAsserts(repository, 2, true, true);
@@ -293,14 +293,14 @@ namespace XmlRepository.Tests
         [Test]
         public void RunningLinqQueriesReturnsAllMatchingEntities()
         {
-            using (var repository = XmlRepository.GetInstance<Person>())
+            using (var repository = XmlRepository.Get(RepositoryFor<Person>.WithIdentity(p => p.Id)))
             {
                 repository.SaveOnSubmit(new[] { this._peter, this._golo });
                 this.ExecuteLoadAsserts(repository, 2, true, true);
             }
 
             var firstName =
-                (from p in XmlRepository.GetInstance<Person>()
+                (from p in XmlRepository.Get(RepositoryFor<Person>.WithIdentity(p => p.Id))
                  where p.LastName == this._peter.LastName
                  select p.FirstName).Single();
 
@@ -308,7 +308,7 @@ namespace XmlRepository.Tests
         }
 
         private void ExecuteLoadAsserts(
-            IXmlRepository<Person> repository,
+            IXmlRepository<Person, Guid> repository,
             int totalNumberOfEntities,
             bool isPeterContained,
             bool isGoloContained)

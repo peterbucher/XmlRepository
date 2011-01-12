@@ -14,7 +14,8 @@ namespace XmlRepository.Contracts
     /// Represents an xml repository.
     /// </summary>
     /// <typeparam name="TEntity">The entity type.</typeparam>
-    public interface IXmlRepository<TEntity> : IXmlRepository, IEnumerable<TEntity> where TEntity: class, new()
+    /// <typeparam name="TIdentity">The identity type.</typeparam>
+    public interface IXmlRepository<TEntity, TIdentity> : IXmlRepository, IEnumerable<TEntity> where TEntity: class, new()
     {
         /// <summary>
         /// Loads the entity that matches the given predicate.
