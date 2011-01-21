@@ -1,5 +1,6 @@
 ﻿using System;
 using XmlRepository.Contracts;
+using System.Linq.Expressions;
 
 namespace XmlRepository
 {
@@ -15,9 +16,18 @@ namespace XmlRepository
         /// <typeparam name="TIdentity">The identity type.</typeparam>
         /// <param name="identitySelector">The identity selector.</param>
         /// <returns>The identity selector.</returns>
-        public static IRepositorySelector<TEntity,TIdentity> WithIdentity<TIdentity>(Func<TEntity, TIdentity> identitySelector)
+        public static IRepositorySelector<TEntity, TIdentity> WithIdentity<TIdentity>(Expression<Func<TEntity, TIdentity>> identitySelector)
         {
-            return new RepositorySelector<TEntity, TIdentity>();
+            var repositorySelector = new RepositorySelector<TEntity, TIdentity>();
+
+            var memberExpression = identitySelector.Body as MemberExpression;
+
+            if (memberExpression != null)
+            {
+                repositorySelector.QueryProperty = memberExpression.Member.Name;
+            }
+
+            return repositorySelector;
         }
     }
 }

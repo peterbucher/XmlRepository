@@ -78,6 +78,7 @@ namespace XmlRepository
         /// <summary>
         /// Gets an xml repository for the specified entity type. If the repository has not been
         /// created yet, a new one is created; otherwise, the existing one is returned.
+        /// e.g. RepositoryFor{Test}.WithIdentity(p => p.Name) for a entity named 'Test' and a identity property named 'Name' which is typed as string.
         /// </summary>
         /// <typeparam name="TEntity">The entity type.</typeparam>
         /// <typeparam name="TIdentity">The identity type.</typeparam>
@@ -89,7 +90,7 @@ namespace XmlRepository
                 // If the repository does not yet exist, create it.
                 if (!Repositories.ContainsKey(typeof(TEntity)))
                 {
-                    Repositories.Add(typeof(TEntity), new XmlRepository<TEntity, TIdentity>());
+                    Repositories.Add(typeof(TEntity), new XmlRepository<TEntity, TIdentity>(repositorySelector.QueryProperty));
                 }
 
                 // Return the requested repository to the caller.
@@ -143,16 +144,16 @@ namespace XmlRepository
         private bool _isDirty;
 
         /// <summary>
-        /// Creates a new instance of the <see cref="XmlRepository" /> type.
+        /// Creates a new instance of the <see cref="XmlRepository" /> type with a given query property.
         /// </summary>
-        internal XmlRepository()
+        /// <param name="queryProperty"></param>
+        internal XmlRepository(string queryProperty)
         {
             lock (this._lockObject)
             {
                 // Set up the default query property.
-                this._defaultQueryProperty = XmlRepository.DefaultQueryProperty;
-                this._defaultQueryPropertyInfo =
-                    typeof(TEntity).GetProperty(this._defaultQueryProperty);
+                this._defaultQueryProperty = queryProperty ?? XmlRepository.DefaultQueryProperty;
+                this._defaultQueryPropertyInfo = typeof(TEntity).GetProperty(this._defaultQueryProperty);
 
                 // Check whether the default query property was found.
                 if (this._defaultQueryPropertyInfo == null)

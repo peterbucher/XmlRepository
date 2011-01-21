@@ -1,4 +1,5 @@
-﻿using XmlRepository.Contracts;
+﻿using System;
+using XmlRepository.Contracts;
 
 namespace XmlRepository
 {
@@ -9,5 +10,13 @@ namespace XmlRepository
     /// <typeparam name="TIdentity">The identity type.</typeparam>
     public class RepositorySelector<TEntity, TIdentity> : IRepositorySelector<TEntity, TIdentity>
     {
+        /// <summary>
+        /// Gets or sets the query property.
+        /// </summary>
+        public string QueryProperty
+        {
+            get;
+            set;
+        }
     }
 }

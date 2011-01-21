@@ -60,6 +60,20 @@ namespace XmlRepository.Tests
         }
 
         [Test]
+        public void ANewlyCreatedRepositoryWithNoDefaultQueryPropertySetInferesItFromTheLambdaExpression()
+        {
+            using(var repository = XmlRepository.Get(RepositoryFor<Geek>.WithIdentity(g => g.SuperId)))
+            {
+                repository.SaveOnSubmit(new Geek{ SuperId = "PeterId"});
+                repository.SubmitChanges();
+
+                var test = repository.LoadBy("PeterId");
+
+                Assert.That(test.SuperId, Is.EqualTo("PeterId"));
+            }
+        }
+
+        [Test]
         public void ANewlyCreatedRepositoryDoesNotContainAnyEntities()
         {
             using (var repository = XmlRepository.Get(RepositoryFor<Person>.WithIdentity(p => p.Id)))

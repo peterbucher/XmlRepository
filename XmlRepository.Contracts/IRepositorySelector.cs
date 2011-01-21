@@ -7,5 +7,13 @@
     /// <typeparam name="TIdentity">The identity type.</typeparam>
     public interface IRepositorySelector<TEntity, TIdentity>
     {
+        /// <summary>
+        /// Gets or sets the query property.
+        /// </summary>
+        string QueryProperty
+        {
+            get;
+            set;
+        }
     }
 }
