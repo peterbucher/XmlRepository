@@ -1,6 +1,6 @@
 ﻿using System.Xml.Linq;
 
-namespace XmlRepository.Contracts.DataSerializers
+namespace XmlRepository.Contracts
 {
     /// <summary>
     /// Serializes or deserializes an XElement to the appropriate format.

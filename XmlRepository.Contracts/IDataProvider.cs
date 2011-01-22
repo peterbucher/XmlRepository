@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace XmlRepository.Contracts.DataProviders
+namespace XmlRepository.Contracts
 {
     /// <summary>
     /// Provides access to a data sources.

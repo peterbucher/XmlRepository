@@ -6,8 +6,6 @@ using System.Reflection;
 using System.Xml.Linq;
 using cherryflavored.net;
 using XmlRepository.Contracts;
-using XmlRepository.Contracts.DataProviders;
-using XmlRepository.Contracts.DataSerializers;
 using XmlRepository.DataProviders;
 using XmlRepository.DataSerializers;
 
