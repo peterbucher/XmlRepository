@@ -6,6 +6,7 @@ using System.Reflection;
 using System.Xml.Linq;
 using cherryflavored.net;
 using XmlRepository.Contracts;
+using XmlRepository.DataMapper;
 using XmlRepository.DataProviders;
 using XmlRepository.DataSerializers;
 
@@ -44,6 +45,15 @@ namespace XmlRepository
             set;
         }
 
+        ///<summary>
+        /// Gets or sets the data mapper. If not set, the ReflectionDataMapper is being used.
+        ///</summary>
+        public static IDataMapper DataMapper
+        {
+            get;
+            set;
+        }
+
         /// <summary>
         /// Gets or sets the data serializer. If not set, the XmlDataSerializer is being used.
         /// </summary>
@@ -70,6 +80,7 @@ namespace XmlRepository
         static XmlRepository()
         {
             Repositories = new Dictionary<Type, IXmlRepository>();
+            DataMapper = new ReflectionDataMapper();
             DataSerializer = new XmlDataSerializer();
             DataProvider = new FileDataProvider(Environment.CurrentDirectory, ".xml");
             DefaultQueryProperty = "Id";
@@ -110,16 +121,6 @@ namespace XmlRepository
         /// Contains the lock object for instance locking.
         /// </summary>
         private readonly object _lockObject = new object();
-
-        /// <summary>
-        /// Contains the conversion method which converts the entity to an XElement.
-        /// </summary>
-        private readonly Func<TEntity, XElement> _toXElementFunction;
-
-        /// <summary>
-        /// Contains the conversion method which converts an XElement to the entity.
-        /// </summary>
-        private readonly Func<XElement, TEntity> _toObjectFunction;
 
         /// <summary>
         /// Contains the name of the entity's property that is used as default key within queries.
@@ -163,10 +164,6 @@ namespace XmlRepository
                             "The property '{0}' has not been found on type '{1}' (is it missing, private, static or misspelled?)",
                             this._defaultQueryProperty, typeof(TEntity).AssemblyQualifiedName));
                 }
-
-                // Set up the conversion methods.
-                this._toXElementFunction = XmlMappingBuilder<TEntity>.ToXElement();
-                this._toObjectFunction = XmlMappingBuilder<TEntity>.ToObject();
 
                 // If the data source has been changed, reload the in-memory representation of the
                 // data source.
@@ -217,7 +214,7 @@ namespace XmlRepository
             {
                 try
                 {
-                    return this._toObjectFunction(
+                    return XmlRepository.DataMapper.ToObject<TEntity>(
                         this.GetElementsByKeyValuePair(this._defaultQueryProperty, identity).Single());
                 }
                 catch (InvalidOperationException e)
@@ -265,7 +262,7 @@ namespace XmlRepository
             {
                 return
                     (from e in this._rootElement.Elements()
-                     select this._toObjectFunction(e)).ToList();
+                     select XmlRepository.DataMapper.ToObject<TEntity>(e)).ToList();
             }
         }
 
@@ -307,7 +304,7 @@ namespace XmlRepository
                 }
 
                 // Add the entity.
-                this._rootElement.Add(this._toXElementFunction(entity));
+                this._rootElement.Add(XmlRepository.DataMapper.ToXElement(entity));
                 this._isDirty = true;
             }
         }
@@ -357,7 +354,7 @@ namespace XmlRepository
                 Enforce.NotNull(predicate, () => predicate);
 
                 (from e in this._rootElement.Elements()
-                 where predicate(this._toObjectFunction(e))
+                 where predicate(XmlRepository.DataMapper.ToObject<TEntity>(e))
                  select e).Remove();
                 this._isDirty = true;
             }
@@ -432,7 +429,7 @@ namespace XmlRepository
             {
                 return
                     (from e in this._rootElement.Elements()
-                     select this._toObjectFunction(e)).GetEnumerator();
+                     select XmlRepository.DataMapper.ToObject<TEntity>(e)).GetEnumerator();
             }
         }
 

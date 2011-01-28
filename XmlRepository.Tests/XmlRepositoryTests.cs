@@ -2,6 +2,7 @@
 using System.Linq;
 using NUnit.Framework;
 using XmlRepository.Contracts;
+using XmlRepository.DataMapper;
 using XmlRepository.DataProviders;
 using XmlRepository.DataSerializers;
 using XmlRepository.Tests.Entities;
@@ -12,6 +13,25 @@ namespace XmlRepository.Tests
     [TestFixture]
     public class XmlRepositoryTests
     {
+        [Test]
+        public void Foo()
+        {
+            XmlRepository.DataProvider = new InMemoryDataProvider();
+
+            using (var repository = XmlRepository.Get(RepositoryFor<Person>.WithIdentity(p => p.Id)))
+            {
+                repository.SaveOnSubmit(new Person() { FirstName = "Peter" });
+                repository.SaveOnSubmit(new Person() { FirstName = "Golo" });
+
+                var test = repository.LoadAll();
+                var peter = repository.LoadBy(p => p.FirstName == "Peter");
+
+                repository.DeleteOnSubmit(p => p.FirstName == "Peter");
+
+                var test2 = repository.LoadAll();
+            }
+        }
+
         private Person _peter;
         private Person _golo;
 
@@ -44,9 +64,10 @@ namespace XmlRepository.Tests
         [SetUp]
         public void InitializeDataProvider()
         {
+            XmlRepository.DataMapper = new ReflectionDataMapper();
             XmlRepository.DataSerializer = new XmlDataSerializer();
             XmlRepository.DataProvider = new InMemoryDataProvider();
-            using(var repository = XmlRepository.Get(RepositoryFor<Person>.WithIdentity(p => p.Id)))
+            using (var repository = XmlRepository.Get(RepositoryFor<Person>.WithIdentity(p => p.Id)))
             {
                 repository.DeleteAllOnSubmit();
             }
@@ -55,16 +76,36 @@ namespace XmlRepository.Tests
         [TearDown]
         public void DestroyDataProvider()
         {
+            XmlRepository.DataMapper = null;
             XmlRepository.DataSerializer = null;
             XmlRepository.DataProvider = null;
         }
 
         [Test]
+        public void ARepositoryCanLoadGeekFriendCollectionFromPerson()
+        {
+            using (var repository = XmlRepository.Get(RepositoryFor<Person>.WithIdentity(p => p.Id)))
+            {
+                var geekFriends = new List<Geek> { new Geek { Alias = "Peter" }, new Geek() { Alias = "Golo" } };
+                var personWithGeekFriends = new Person() { FirstName = "Roberto", Friends = geekFriends };
+
+                repository.SaveOnSubmit(personWithGeekFriends);
+
+                var all = repository.LoadAll();
+
+                var robertoWithGeeks = repository.LoadBy(p => p.FirstName == "Roberto");
+                var robertosFriends = robertoWithGeeks.Friends;
+
+                var test = repository.LoadBy(p => p.Friends != null && p.Friends.Count > 0);
+            }
+        }
+
+        [Test]
         public void ANewlyCreatedRepositoryWithNoDefaultQueryPropertySetInferesItFromTheLambdaExpression()
         {
-            using(var repository = XmlRepository.Get(RepositoryFor<Geek>.WithIdentity(g => g.SuperId)))
+            using (var repository = XmlRepository.Get(RepositoryFor<Geek>.WithIdentity(g => g.SuperId)))
             {
-                repository.SaveOnSubmit(new Geek{ SuperId = "PeterId"});
+                repository.SaveOnSubmit(new Geek { SuperId = "PeterId" });
                 repository.SubmitChanges();
 
                 var test = repository.LoadBy("PeterId");
@@ -209,7 +250,7 @@ namespace XmlRepository.Tests
         {
             using (var repository = XmlRepository.Get(RepositoryFor<Person>.WithIdentity(p => p.Id)))
             {
-                repository.SaveOnSubmit(new[] {this._peter, this._golo});
+                repository.SaveOnSubmit(new[] { this._peter, this._golo });
                 this.ExecuteLoadAsserts(repository, 2, true, true);
 
                 var entities = repository.LoadAll();
@@ -341,11 +382,11 @@ namespace XmlRepository.Tests
         {
             using (var repository = XmlRepository.Get(RepositoryFor<Person>.WithIdentity(p => p.Id)))
             {
-                repository.SaveOnSubmit(new[] {this._peter, this._golo});
+                repository.SaveOnSubmit(new[] { this._peter, this._golo });
                 this.ExecuteLoadAsserts(repository, 2, true, true);
 
                 int count = 0;
-                foreach(var person in repository)
+                foreach (var person in repository)
                 {
                     Assert.That(person.Id, Is.Not.EqualTo(Guid.Empty));
                     count++;
