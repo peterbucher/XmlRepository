@@ -40,10 +40,10 @@ namespace XmlRepository.Tests.Entities
             set;
         }
 
-        //public List<Geek> Friends
-        //{
-        //    get;
-        //    set;
-        //}
+        public List<Geek> Friends
+        {
+            get;
+            set;
+        }
     }
 }

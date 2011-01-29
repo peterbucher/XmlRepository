@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 
 namespace XmlRepository.DataMapper
@@ -25,6 +27,11 @@ namespace XmlRepository.DataMapper
             this.Name = propertyInfo.Name;
 
             this.IsClassPropertyType = this.PropertyType.IsClass && this.PropertyType != typeof(string);
+            
+            if(this.IsClassPropertyType)
+            {
+                this.IsGenericCollectionPropertyType = this.IsGenericCollectionType(this.PropertyType);
+            }
         }
 
         ///<summary>
@@ -39,6 +46,14 @@ namespace XmlRepository.DataMapper
         /// 
         /// </summary>
         public bool IsClassPropertyType
+        {
+            get;
+            set;
+        }
+
+        ///<summary>
+        ///</summary>
+        public bool IsGenericCollectionPropertyType
         {
             get;
             set;
@@ -84,6 +99,12 @@ namespace XmlRepository.DataMapper
         {
             get;
             set;
+        }
+
+        private bool IsGenericCollectionType(Type type)
+        {
+            return type.IsGenericType && type.GetInterfaces()
+                .Any(i => i.IsGenericType && i.GetGenericTypeDefinition().Equals(typeof(IEnumerable<>)));
         }
     }
 }

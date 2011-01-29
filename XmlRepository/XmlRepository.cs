@@ -134,16 +134,22 @@ namespace XmlRepository
                 // Add default mappings.
                 foreach (var property in type.GetProperties())
                 {
-                    AddMappingFor(property);
+                    if(!PropertyMappings[type].Any(p => p.Name == property.Name))
+                    {
+                        AddMappingFor(property);
+                    }
                 }
             }
         }
 
         ///<summary>
         ///</summary>
-        public static void AddMappingFor(PropertyInfo propertyInfo)
+        private static void AddMappingFor(PropertyInfo propertyInfo)
         {
-            AddMappingFor(propertyInfo.DeclaringType, new PropertyMapping(propertyInfo));
+            lock(LockObject)
+            {
+                AddMappingFor(propertyInfo.DeclaringType, new PropertyMapping(propertyInfo));
+            }
         }
 
         ///<summary>
@@ -158,7 +164,10 @@ namespace XmlRepository
                     PropertyMappings.Add(type, new List<PropertyMapping>());
                 }
 
-                PropertyMappings[type].Add(mapping);
+                if (!PropertyMappings[type].Any(p => p.Name == mapping.Name))
+                {
+                    PropertyMappings[type].Add(mapping);
+                }
             }
         }
     }

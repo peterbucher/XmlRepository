@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using NUnit.Framework;
 using XmlRepository.DataMapper;
 using XmlRepository.DataProviders;
@@ -12,7 +13,7 @@ namespace XmlRepository.Tests
         [Test]
         public void FoooooBar()
         {
-            XmlRepository.DataProvider = new FileDataProvider(Environment.CurrentDirectory, "xml");
+            XmlRepository.DataProvider = new InMemoryDataProvider(); // new FileDataProvider(Environment.CurrentDirectory, "xml");
 
             var mapping = new PropertyMapping();
             mapping.EntityType = typeof (Person);
@@ -40,12 +41,16 @@ namespace XmlRepository.Tests
 
             using (var repository = XmlRepository.Get(RepositoryFor<Person>.WithIdentity(p => p.Id)))
             {
+                var geek = new Geek {Alias = "Jackal"};
+
                 var peter = new Person();
+
                 peter.FirstName = "Peter";
                 peter.LastName = "Bucher";
                 peter.Birthday = new DateTime(1983, 10, 17);
+                peter.Friends = new List<Geek>(new[] {geek, new Geek() { Alias = "YEAH"}});
 
-                peter.Geek = new Geek { Alias = "Jackal"};
+                peter.Geek = geek;
 
                 repository.SaveOnSubmit(peter);
 
