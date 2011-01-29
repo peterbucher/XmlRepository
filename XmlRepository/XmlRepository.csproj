@@ -108,8 +108,10 @@
   <ItemGroup>
     <Compile Include="DataMapper\ReflectionDataMapper.cs" />
     <Compile Include="DataProviders\InMemoryDataProvider.cs" />
+    <Compile Include="DataProviders\DelegateDataProvider.cs" />
     <Compile Include="DataSerializers\JsonDataSerializer.cs" />
     <Compile Include="DataSerializers\XmlDataSerializer.cs" />
+    <Compile Include="ElementNotFoundException.cs" />
     <Compile Include="EntityNotFoundException.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="DataProviders\FileDataProvider.cs" />

@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Reflection;
 using System.Xml.Linq;
 using cherryflavored.net;
@@ -194,10 +195,18 @@ namespace XmlRepository
         {
             lock (this._lockObject)
             {
-                return
-                    from e in this._rootElement.Elements()
-                    where (e.Element(key).Value.Equals(value.ToString()))
-                    select e;
+                try
+                {
+                    var elementsByKeyAndValue = this._rootElement.Elements()
+                        .Where(e => e.Element(key).Value.Equals(value.ToString()));
+
+                    return elementsByKeyAndValue;
+
+                }
+                catch (NullReferenceException e)
+                {
+                    throw new ElementNotFoundException(string.Format("'element {0}' not found.", key), e);
+                }
             }
         }
 
@@ -236,16 +245,17 @@ namespace XmlRepository
             lock (this._lockObject)
             {
                 var entities = this.LoadAll().Where(predicate);
+
                 try
                 {
                     return entities.Single();
                 }
                 catch (InvalidOperationException e)
                 {
-                    if (!entities.Any())
-                        throw new EntityNotFoundException(null, e);
-                    else
-                        throw;
+                    throw new EntityNotFoundException(
+                        string.Format(
+                            "Entity of type '{0}' that matches to 'TODO: Wie predicate als string darstellen', was not fount (no elements, no matching or more than one matching element)",
+                            typeof (TEntity).Name), e);
                 }
             }
         }
