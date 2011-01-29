@@ -35,7 +35,13 @@ namespace XmlRepository.DataMapper
 
                 switch (mapping.MapType)
                 {
-                    case MapType.Element:
+                    case MapType.Attribute:
+                        element.Add(new XAttribute(mapping.MappedName, value));
+                        break;
+                    case MapType.Content:
+                        element.Add(value);
+                        break;
+                    default:
                         if (mapping.IsClassPropertyType)
                         {
                             if (mapping.IsGenericCollectionPropertyType)
@@ -64,24 +70,27 @@ namespace XmlRepository.DataMapper
                             }
                             else
                             {
-                                element.Add(this.GetType().GetMethod("ToXElement").MakeGenericMethod(
-                                    mapping.PropertyType).Invoke(
-                                        this, new[]
+                                object propertyValue = type.GetProperty(mapping.Name).GetValue(entity, null);
+
+                                if (propertyValue != null)
+                                {
+                                    element.Add(this.GetType().GetMethod("ToXElement").MakeGenericMethod(
+                                        mapping.PropertyType).Invoke(
+                                            this, new[]
                                                   {
-                                                      type.GetProperty(mapping.Name).GetValue(entity, null)
+                                                      propertyValue
                                                   }));
+                                }
+                                else
+                                {
+                                    element.Add(new XElement(mapping.MappedName));
+                                }
                             }
                         }
                         else
                         {
                             element.Add(new XElement(mapping.MappedName, value));
                         }
-                        break;
-                    case MapType.Attribute:
-                        element.Add(new XAttribute(mapping.MappedName, value));
-                        break;
-                    case MapType.Content:
-                        element.Add(value);
                         break;
                 }
             }
@@ -98,13 +107,22 @@ namespace XmlRepository.DataMapper
 
             var mappings = XmlRepository.PropertyMappings[type];
 
-            string value = null;
+            string value = string.Empty;
 
             foreach (var mapping in mappings)
             {
                 switch (mapping.MapType)
                 {
-                    case MapType.Element:
+                    case MapType.Attribute:
+                        if (entityElement.HasAttributes)
+                        {
+                            value = entityElement.Attribute(mapping.MappedName).Value;
+                        }
+                        break;
+                    case MapType.Content:
+                        value = entityElement.Value;
+                        break;
+                    default:
                         if (mapping.IsClassPropertyType)
                         {
                             if (mapping.IsGenericCollectionPropertyType)
@@ -138,26 +156,29 @@ namespace XmlRepository.DataMapper
                             }
                             else
                             {
-                                mapping
-                                    .EntityType
-                                    .GetProperty(mapping.Name)
-                                    .SetValue(entity,
-                                              this.GetType().GetMethod("ToObject").MakeGenericMethod(
-                                                  mapping.PropertyType).Invoke(
-                                                      this, new object[] { entityElement.Element(mapping.Name) })
-                                              , null);
+                                object possibleValue = this.GetType().GetMethod("ToObject").MakeGenericMethod(
+                                    mapping.PropertyType).Invoke(
+                                        this, new object[] {entityElement.Element(mapping.Name)});
+
+                                if(possibleValue != null)
+                                {
+                                    mapping
+                                        .EntityType
+                                        .GetProperty(mapping.Name)
+                                        .SetValue(entity, possibleValue, null);
+                                } else
+                                {
+                                    continue;
+                                }
                             }
 
                             continue;
                         }
 
-                        value = entityElement.Element(mapping.MappedName).Value;
-                        break;
-                    case MapType.Attribute:
-                        value = entityElement.Attribute(mapping.MappedName).Value;
-                        break;
-                    case MapType.Content:
-                        value = entityElement.Value;
+                        if (entityElement.HasElements)
+                        {
+                            value = entityElement.Element(mapping.MappedName).Value;
+                        }
                         break;
                 }
 
@@ -168,6 +189,7 @@ namespace XmlRepository.DataMapper
 
             return (TEntity)entity;
         }
+
         internal static readonly MethodInfo ToOrDefaultMethod = typeof(ExtensionMethods).GetMethod("ToOrDefault", new[] { typeof(string) });
 
         private object GetConvertedValue(Type type, string value)

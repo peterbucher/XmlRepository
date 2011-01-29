@@ -134,6 +134,11 @@ namespace XmlRepository
                 // Add default mappings.
                 foreach (var property in type.GetProperties())
                 {
+                    if(!PropertyMappings.ContainsKey(type))
+                    {
+                        PropertyMappings[type] = new List<PropertyMapping>();
+                    }
+
                     if(!PropertyMappings[type].Any(p => p.Name == property.Name))
                     {
                         AddMappingFor(property);
@@ -260,19 +265,32 @@ namespace XmlRepository
         /// <returns>
         /// A list of elements. If no elements were found, an empty list is returned.
         /// </returns>
-        private
-            IEnumerable<XElement> GetElementsByKeyValuePair
-            (string key, object value)
+        private IEnumerable<XElement> GetElementsByKeyValuePair(string key, object value)
         {
             lock (this._lockObject)
             {
                 try
                 {
-                    var elementsByKeyAndValue = this._rootElement.Elements()
-                        .Where(e => e.Element(key).Value.Equals(value.ToString()));
+                    var idMapping = XmlRepository
+                        .PropertyMappings[typeof (TEntity)]
+                        .Single(m => m.Name == this._defaultQueryProperty);
 
-                    return elementsByKeyAndValue;
+                    Func<XElement, bool> predicate;
 
+                    switch (idMapping.MapType)
+                    {
+                        case MapType.Element:
+                            predicate = e => e.Element(key).Value.Equals(value.ToString());
+                            break;
+                        case MapType.Attribute:
+                            predicate = e => e.Attribute(key).Value.Equals(value.ToString());
+                            break;
+                        default:
+                            predicate = e => e.Name.Equals(key) && e.Value.Equals(value.ToString());
+                            break;
+                    }
+
+                    return this._rootElement.Elements().Where(predicate);
                 }
                 catch (NullReferenceException e)
                 {
@@ -377,10 +395,7 @@ namespace XmlRepository
         /// Saves or updates the given entity.
         /// </summary>
         /// <param name="entity">The entity.</param>
-        public
-            void SaveOnSubmit
-            (TEntity
-            entity)
+        public void SaveOnSubmit(TEntity entity)
         {
             lock (this._lockObject)
             {
@@ -389,10 +404,9 @@ namespace XmlRepository
                 // Check whether the entity already exists. If so, remove it (and simulate an
                 // update this way).
                 var defaultQueryPropertyValue = _defaultQueryPropertyInfo.GetValue(entity, null);
-                var element =
-                    (this.GetElementsByKeyValuePair(
-                        this._defaultQueryProperty, defaultQueryPropertyValue))
-                        .SingleOrDefault();
+
+                var element = (this.GetElementsByKeyValuePair(this._defaultQueryProperty, defaultQueryPropertyValue)).SingleOrDefault();
+
                 if (element != null)
                 {
                     element.Remove();
