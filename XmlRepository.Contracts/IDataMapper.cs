@@ -10,9 +10,9 @@ namespace XmlRepository.Contracts
         /// <summary>
         /// Maps the given XElement that represents one node to a object.
         /// </summary>
-        /// <param name="singleElement">The root element.</param>
+        /// <param name="entityElement">The root element.</param>
         /// <returns>The object filled with the data of given XElement.</returns>
-        TEntity ToObject<TEntity>(XElement singleElement) where TEntity : new();
+        TEntity ToObject<TEntity>(XElement entityElement) where TEntity : new();
 
         /// <summary>
         /// Maps the given object to a xml-dom.

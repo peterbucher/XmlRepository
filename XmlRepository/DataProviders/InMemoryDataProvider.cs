@@ -23,7 +23,7 @@ namespace XmlRepository.DataProviders
         /// </summary>
         public InMemoryDataProvider()
         {
-            this._dataContent = "<root />";
+            this._dataContent = XmlRepository.RootElementXml;
         }
 
         /// <summary>

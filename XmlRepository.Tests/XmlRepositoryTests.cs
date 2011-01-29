@@ -1,12 +1,8 @@
 ﻿using System;
-using System.Linq;
 using NUnit.Framework;
-using XmlRepository.Contracts;
 using XmlRepository.DataMapper;
 using XmlRepository.DataProviders;
-using XmlRepository.DataSerializers;
 using XmlRepository.Tests.Entities;
-using System.Collections.Generic;
 
 namespace XmlRepository.Tests
 {
@@ -16,7 +12,45 @@ namespace XmlRepository.Tests
         [Test]
         public void FoooooBar()
         {
-            
+            XmlRepository.DataProvider = new FileDataProvider(Environment.CurrentDirectory, "xml");
+
+            var mapping = new PropertyMapping();
+            mapping.EntityType = typeof (Person);
+            mapping.PropertyType = typeof(Guid);
+            mapping.Name = "Id";
+            mapping.MapType = MapType.Attribute;
+
+            XmlRepository.AddMappingFor(typeof(Person), mapping);
+
+            var test = new PropertyMapping();
+            test.EntityType = typeof(Person);
+            test.PropertyType = typeof(string);
+            test.Name = "LastName";
+            test.MapType = MapType.Element;
+
+            XmlRepository.AddMappingFor(typeof(Person), test);
+
+            var a = new PropertyMapping();
+            a.EntityType = typeof (Geek);
+            a.PropertyType = typeof(string);
+            a.Name = "SuperId";
+            a.MapType = MapType.Attribute;
+
+            XmlRepository.AddMappingFor(typeof(Geek), a);
+
+            using (var repository = XmlRepository.Get(RepositoryFor<Person>.WithIdentity(p => p.Id)))
+            {
+                var peter = new Person();
+                peter.FirstName = "Peter";
+                peter.LastName = "Bucher";
+                peter.Birthday = new DateTime(1983, 10, 17);
+
+                peter.Geek = new Geek { Alias = "Jackal"};
+
+                repository.SaveOnSubmit(peter);
+
+                var loadedData = repository.LoadAll();
+            }
         }
 
         //[Test]

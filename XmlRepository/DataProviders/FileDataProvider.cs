@@ -40,9 +40,16 @@ namespace XmlRepository.DataProviders
         /// <returns>The root element.</returns>
         public string Load<TEntity>()
         {
-            lock(this._lockObject)
+            lock (this._lockObject)
             {
-                return File.ReadAllText(this.GetDataFile<TEntity>());
+                string dataFilePath = this.GetDataFile<TEntity>();
+
+                if (File.Exists(dataFilePath))
+                {
+                    return File.ReadAllText(this.GetDataFile<TEntity>());
+                }
+
+                return XmlRepository.RootElementXml;
             }
         }
 

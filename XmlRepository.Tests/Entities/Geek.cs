@@ -4,6 +4,17 @@ namespace XmlRepository.Tests.Entities
 {
     public class Geek
     {
+        public Geek()
+        {
+            this.Id = Guid.NewGuid();
+        }
+
+        public Guid Id
+        {
+            get;
+            set;
+        }
+
         public string SuperId
         {
             get;

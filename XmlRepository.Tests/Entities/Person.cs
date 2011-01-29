@@ -28,16 +28,22 @@ namespace XmlRepository.Tests.Entities
             set;
         }
 
+        public Geek Geek
+        {
+            get;
+            set;
+        }
+
         public DateTime Birthday
         {
             get;
             set;
         }
 
-        public List<Geek> Friends
-        {
-            get;
-            set;
-        }
+        //public List<Geek> Friends
+        //{
+        //    get;
+        //    set;
+        //}
     }
 }

@@ -118,7 +118,7 @@
         <WebProjectProperties>
           <UseIIS>False</UseIIS>
           <AutoAssignPort>True</AutoAssignPort>
-          <DevelopmentServerPort>36102</DevelopmentServerPort>
+          <DevelopmentServerPort>1404</DevelopmentServerPort>
           <DevelopmentServerVPath>/</DevelopmentServerVPath>
           <IISUrl>http://localhost/todo</IISUrl>
           <NTLMAuthentication>False</NTLMAuthentication>

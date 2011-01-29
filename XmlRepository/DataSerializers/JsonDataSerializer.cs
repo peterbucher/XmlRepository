@@ -36,9 +36,9 @@ namespace XmlRepository.DataSerializers
         {
             lock (this._lockObject)
             {
-                if(content.Length <= 8)
+                if(content.Length <= XmlRepository.RootElementXml.Length)
                 {
-                    return new XElement("root");
+                    return new XElement(XmlRepository.RootElementXml);
                 }
 
                 return JsonConvert.DeserializeXNode(content).Root;
