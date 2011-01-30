@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
 using XmlRepository.Contracts;
-using XmlRepository.DataMapper;
 using XmlRepository.DataProviders;
 using XmlRepository.DataSerializers;
+using XmlRepository.Mapping;
 using XmlRepository.Tests.Entities;
 
 namespace XmlRepository.Tests

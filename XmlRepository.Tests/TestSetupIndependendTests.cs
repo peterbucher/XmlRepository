@@ -2,9 +2,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
-using XmlRepository.DataMapper;
 using XmlRepository.DataProviders;
-using XmlRepository.DataSerializers;
+using XmlRepository.Mapping;
 using XmlRepository.Tests.Entities;
 
 namespace XmlRepository.Tests
@@ -12,15 +11,28 @@ namespace XmlRepository.Tests
     [TestFixture]
     public class TestSetupIndependendTests
     {
-        [SetUp]
-        public void InitializeDataProvider()
+        [Test]
+        public void DataAvailableInProviderIsLoadAutomatically()
         {
-            XmlRepository.DataMapper = new ReflectionDataMapper();
-            XmlRepository.DataSerializer = new XmlDataSerializer();
-            XmlRepository.DataProvider = new InMemoryDataProvider();
+            XmlRepository.DataProvider = new InMemoryDataProvider(
+                @"<root>
+  <Person>
+    <Id>c186fb12-dd38-4784-8b48-aad96a6510c4</Id>
+    <LastName>Bucher</LastName>
+    <FirstName>Peter</FirstName>
+    <Geek>
+      <Id>8f8b747e-3f16-4938-a384-980fc8aa8dd7</Id>
+      <SuperId>test</SuperId>
+      <Alias>Jackal</Alias>
+    </Geek>
+    <Friends></Friends>
+    <Birthday>17.10.1983 00:00:00</Birthday>
+  </Person>
+</root>");
+
             using (var repository = XmlRepository.Get(RepositoryFor<Person>.WithIdentity(p => p.Id)))
             {
-                repository.DeleteAllOnSubmit();
+                Assert.That(repository.LoadAll().Count() == 1);
             }
         }
 
@@ -75,27 +87,27 @@ namespace XmlRepository.Tests
             mapping.EntityType = typeof(Person);
             mapping.PropertyType = typeof(Guid);
             mapping.Name = "Id";
-            mapping.MapType = MapType.Attribute;
+            mapping.XmlMappingType = XmlMappingType.Attribute;
 
-            XmlRepository.AddMappingFor(typeof(Person), mapping);
+            XmlRepository.AddPropertyMappingFor(typeof(Person), mapping);
 
             var test = new PropertyMapping();
             test.EntityType = typeof(Person);
             test.PropertyType = typeof(string);
             test.Name = "LastName";
-            test.MapType = MapType.Element;
+            test.XmlMappingType = XmlMappingType.Element;
 
-            XmlRepository.AddMappingFor(typeof(Person), test);
+            XmlRepository.AddPropertyMappingFor(typeof(Person), test);
 
             var a = new PropertyMapping();
             a.EntityType = typeof(Geek);
             a.PropertyType = typeof(string);
             a.Name = "SuperId";
-            a.MapType = MapType.Attribute;
+            a.XmlMappingType = XmlMappingType.Attribute;
 
-            XmlRepository.AddMappingFor(typeof(Geek), a);
+            XmlRepository.AddPropertyMappingFor(typeof(Geek), a);
 
-            using (var repository = XmlRepository.Get(RepositoryFor<Person>.WithIdentity(p => p.Id)))
+            using (var repository = XmlRepository.GetWithDiscardChanges(RepositoryFor<Person>.WithIdentity(p => p.Id)))
             {
                 var geek = new Geek { Alias = "Jackal" };
 
@@ -125,7 +137,7 @@ namespace XmlRepository.Tests
         {
             XmlRepository.DataProvider = new InMemoryDataProvider();
 
-            using (var repository = XmlRepository.Get(RepositoryFor<Person>.WithIdentity(p => p.Id)))
+            using (var repository = XmlRepository.GetWithDiscardChanges(RepositoryFor<Person>.WithIdentity(p => p.Id)))
             {
                 repository.SaveOnSubmit(new Person() { FirstName = "Peter" });
                 repository.SaveOnSubmit(new Person() { FirstName = "Golo" });

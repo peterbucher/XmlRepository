@@ -18,8 +18,8 @@ namespace XmlRepository
         /// <returns>The identity selector.</returns>
         public static IRepositorySelector<TEntity, TIdentity> WithIdentity<TIdentity>(Expression<Func<TEntity, TIdentity>> identitySelector)
         {
+            // Sets the property name from TIdentity as QueryProperty.
             var repositorySelector = new RepositorySelector<TEntity, TIdentity>();
-
             var memberExpression = identitySelector.Body as MemberExpression;
 
             if (memberExpression != null)

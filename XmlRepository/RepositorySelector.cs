@@ -1,5 +1,4 @@
-﻿using System;
-using XmlRepository.Contracts;
+﻿using XmlRepository.Contracts;
 
 namespace XmlRepository
 {

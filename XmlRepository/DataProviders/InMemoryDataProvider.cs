@@ -27,6 +27,15 @@ namespace XmlRepository.DataProviders
         }
 
         /// <summary>
+        /// Initializes a new instance of the <see cref="InMemoryDataProvider" /> type with initial data passed in.
+        /// <param name="initialDataContent">Initial data for the data provider.</param>
+        /// </summary>
+        public InMemoryDataProvider(string initialDataContent)
+        {
+            this._dataContent = initialDataContent;
+        }
+
+        /// <summary>
         /// Loads the data source and returns its content.
         /// </summary>
         /// <typeparam name="TEntity">The entity type that shall be loaded.</typeparam>

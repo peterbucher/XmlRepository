@@ -106,15 +106,16 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="DataMapper\MapType.cs" />
-    <Compile Include="DataMapper\ReflectionDataMapper.cs" />
+    <Compile Include="ExtensionMethods\System\ExtensionMethods.cs" />
+    <Compile Include="Mapping\XmlMappingType.cs" />
+    <Compile Include="Mapping\ReflectionDataMapper.cs" />
     <Compile Include="DataProviders\InMemoryDataProvider.cs" />
     <Compile Include="DataProviders\DelegateDataProvider.cs" />
     <Compile Include="DataSerializers\JsonDataSerializer.cs" />
     <Compile Include="DataSerializers\XmlDataSerializer.cs" />
     <Compile Include="ElementNotFoundException.cs" />
     <Compile Include="EntityNotFoundException.cs" />
-    <Compile Include="DataMapper\PropertyMapping.cs" />
+    <Compile Include="Mapping\PropertyMapping.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="DataProviders\FileDataProvider.cs" />
     <Compile Include="RepositoryFor.cs" />

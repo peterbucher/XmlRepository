@@ -2,14 +2,13 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using System.Linq.Expressions;
 using System.Reflection;
 using System.Xml.Linq;
 using cherryflavored.net;
 using XmlRepository.Contracts;
-using XmlRepository.DataMapper;
 using XmlRepository.DataProviders;
 using XmlRepository.DataSerializers;
+using XmlRepository.Mapping;
 
 namespace XmlRepository
 {
@@ -105,61 +104,97 @@ namespace XmlRepository
         /// </summary>
         /// <typeparam name="TEntity">The entity type.</typeparam>
         /// <typeparam name="TIdentity">The identity type.</typeparam>
+        /// <param name="repositorySelector">The selector for entity type and identity type.</param>
         /// <returns>An xml repository.</returns>
         public static IXmlRepository<TEntity, TIdentity> Get<TEntity, TIdentity>(IRepositorySelector<TEntity, TIdentity> repositorySelector) where TEntity : class, new()
         {
             lock (LockObject)
             {
-                // If the repository does not yet exist, create it.
-                if (!Repositories.ContainsKey(typeof(TEntity)))
+                // Get new instance, or if existing, with inmemory status.
+                return GetInternal(repositorySelector, false);
+            }
+        }
+
+        /// <summary>
+        /// Gets an xml repository, but in every case with discarded / clean instance status for the specified entity type. If the repository has not been
+        /// created yet, a new one is created; otherwise, the existing one is returned.
+        /// e.g. RepositoryFor{Test}.WithIdentity(p => p.Name) for a entity named 'Test' and a identity property named 'Name' which is typed as string.
+        /// </summary>
+        /// <typeparam name="TEntity">The entity type.</typeparam>
+        /// <typeparam name="TIdentity">The identity type.</typeparam>
+        /// <param name="repositorySelector">The selector for entity type and identity type.</param>
+        /// <returns>An xml repository.</returns>
+        public static IXmlRepository<TEntity, TIdentity> GetWithDiscardChanges<TEntity, TIdentity>(IRepositorySelector<TEntity, TIdentity> repositorySelector) where TEntity : class, new()
+        {
+            lock (LockObject)
+            {
+                // Get new instance, or if existing, with discarded inmemory status, which does call DiscardChanges on.
+                return GetInternal(repositorySelector, true);
+            }
+        }
+
+        /// <summary>
+        /// Gets an xml repository for the specified entity type. If the repository has not been
+        /// created yet, a new one is created; otherwise, the existing one is returned.
+        /// e.g. RepositoryFor{Test}.WithIdentity(p => p.Name) for a entity named 'Test' and a identity property named 'Name' which is typed as string.
+        /// </summary>
+        /// <typeparam name="TEntity">The entity type.</typeparam>
+        /// <typeparam name="TIdentity">The identity type.</typeparam>
+        /// <param name="repositorySelector">The selector for entity type and identity type.</param>
+        /// <param name="discardChanges">Flag whether or not to discard the inmemory changes.</param>
+        /// <returns>An xml repository.</returns>
+        private static IXmlRepository<TEntity, TIdentity> GetInternal<TEntity, TIdentity>(IRepositorySelector<TEntity, TIdentity> repositorySelector, bool discardChanges) where TEntity : class, new()
+        {
+            lock (LockObject)
+            {
+                if (!Repositories.ContainsKey(typeof (TEntity)))
                 {
-                    Repositories.Add(typeof(TEntity), new XmlRepository<TEntity, TIdentity>(repositorySelector.QueryProperty));
+                    var repository = new XmlRepository<TEntity, TIdentity>(repositorySelector.QueryProperty);
+                    Repositories.Add(typeof (TEntity), repository);
 
                     // Add default mappings.
-                    AddDefaultMappingsFor(typeof (TEntity));
-                }
+                    AddDefaultPropertyMappingsFor(typeof (TEntity));
 
-                // Return the requested repository to the caller.
-                return Repositories[typeof(TEntity)] as IXmlRepository<TEntity, TIdentity>;
+                    // Return the requested repository to the caller.
+                    return repository;
+                }
+                else
+                {
+                    var repository = Repositories[typeof (TEntity)] as IXmlRepository<TEntity, TIdentity>;
+
+                    if (discardChanges)
+                    {
+                        repository.DiscardChanges();
+                    }
+
+                    // Return the requested repository to the caller.
+                    return repository;
+                }
             }
         }
 
         ///<summary>
+        /// Adds default object propeties to xml structure mappings for a type, if not already created.
         ///</summary>
-        ///<param name="type"></param>
-        public static void AddDefaultMappingsFor(Type type)
+        ///<param name="type">The type who may need default mappings.</param>
+        public static void AddDefaultPropertyMappingsFor(Type type)
         {
-            lock(LockObject)
+            lock (LockObject)
             {
                 // Add default mappings.
                 foreach (var property in type.GetProperties())
                 {
-                    if(!PropertyMappings.ContainsKey(type))
-                    {
-                        PropertyMappings[type] = new List<PropertyMapping>();
-                    }
-
-                    if(!PropertyMappings[type].Any(p => p.Name == property.Name))
-                    {
-                        AddMappingFor(property);
-                    }
+                    AddPropertyMappingFor(property.DeclaringType, new PropertyMapping(property));
                 }
             }
         }
 
         ///<summary>
+        /// Adds a custom object properties to xml structure mapping for a type.
+        /// <param name="type">The type who is the mapping for.</param>
+        /// <param name="mapping">The mapping for one property of the given type.</param>
         ///</summary>
-        private static void AddMappingFor(PropertyInfo propertyInfo)
-        {
-            lock(LockObject)
-            {
-                AddMappingFor(propertyInfo.DeclaringType, new PropertyMapping(propertyInfo));
-            }
-        }
-
-        ///<summary>
-        ///</summary>
-        public static void AddMappingFor(Type type, PropertyMapping mapping)
+        public static void AddPropertyMappingFor(Type type, PropertyMapping mapping)
         {
             lock (LockObject)
             {
@@ -169,6 +204,7 @@ namespace XmlRepository
                     PropertyMappings.Add(type, new List<PropertyMapping>());
                 }
 
+                // Do not override property mappings. (TODO: maybe a "Override" property on PropertyMappingType?)
                 if (!PropertyMappings[type].Any(p => p.Name == mapping.Name))
                 {
                     PropertyMappings[type].Add(mapping);
@@ -182,48 +218,40 @@ namespace XmlRepository
     /// </summary>
     /// <typeparam name="TEntity">The entity type.</typeparam>
     /// <typeparam name="TIdentity">The identity type.</typeparam>
-    internal class XmlRepository<TEntity, TIdentity> : IXmlRepository<TEntity, TIdentity>
-        where TEntity : class, new()
+    internal class XmlRepository<TEntity, TIdentity> : IXmlRepository<TEntity, TIdentity> where TEntity : class, new()
     {
         /// <summary>
         /// Contains the lock object for instance locking.
         /// </summary>
-        private readonly
-            object _lockObject = new object();
+        private readonly object _lockObject = new object();
 
         /// <summary>
         /// Contains the name of the entity's property that is used as default key within queries.
         /// </summary>
-        private readonly
-        string _defaultQueryProperty;
+        private readonly string _defaultQueryProperty;
 
         /// <summary>
         /// Contains the property info of the entity's property that is used as default key within
         /// queries.
         /// </summary>
-        private readonly
-        PropertyInfo _defaultQueryPropertyInfo;
+        private readonly PropertyInfo _defaultQueryPropertyInfo;
 
         /// <summary>
         /// Contains a reference to the root element of the data source.
         /// </summary>
-        private
-        XElement _rootElement;
+        private XElement _rootElement;
 
         /// <summary>
         /// Contains <c>true</c> if the in-memory representation of the data source contains
         /// changes that have not yet been submitted to the data source; <c>false</c> otherwise.
         /// </summary>
-        private
-        bool _isDirty;
+        private bool _isDirty;
 
         /// <summary>
         /// Creates a new instance of the <see cref="XmlRepository" /> type with a given query property.
         /// </summary>
         /// <param name="queryProperty"></param>
-        internal
-        XmlRepository(string
-        queryProperty)
+        internal XmlRepository(string queryProperty)
         {
             lock (this._lockObject)
             {
@@ -272,17 +300,17 @@ namespace XmlRepository
                 try
                 {
                     var idMapping = XmlRepository
-                        .PropertyMappings[typeof (TEntity)]
+                        .PropertyMappings[typeof(TEntity)]
                         .Single(m => m.Name == this._defaultQueryProperty);
 
                     Func<XElement, bool> predicate;
 
-                    switch (idMapping.MapType)
+                    switch (idMapping.XmlMappingType)
                     {
-                        case MapType.Element:
+                        case XmlMappingType.Element:
                             predicate = e => e.Element(key).Value.Equals(value.ToString());
                             break;
-                        case MapType.Attribute:
+                        case XmlMappingType.Attribute:
                             predicate = e => e.Attribute(key).Value.Equals(value.ToString());
                             break;
                         default:
@@ -306,10 +334,7 @@ namespace XmlRepository
         /// <returns>
         /// The entity, if an entity was found. Otherwise, an exception is thrown.
         /// </returns>
-        public
-            TEntity LoadBy
-            (TIdentity
-            identity)
+        public TEntity LoadBy(TIdentity identity)
         {
             lock (this._lockObject)
             {
@@ -332,10 +357,7 @@ namespace XmlRepository
         /// <returns>
         /// The entity, if an entity was found. Otherwise, an exception is thrown.
         /// </returns>
-        public
-            TEntity LoadBy
-            (Func<TEntity, bool>
-            predicate)
+        public TEntity LoadBy(Func<TEntity, bool> predicate)
         {
             lock (this._lockObject)
             {
@@ -361,9 +383,7 @@ namespace XmlRepository
         /// <returns>
         /// A list of all entities. If no entities were found, an empty list is returned.
         /// </returns>
-        public
-            IEnumerable<TEntity> LoadAll
-            ()
+        public IEnumerable<TEntity> LoadAll()
         {
             lock (this._lockObject)
             {
@@ -380,10 +400,7 @@ namespace XmlRepository
         /// <returns>
         /// A list of all entities. If no entities were found, an empty list is returned.
         /// </returns>
-        public
-            IEnumerable<TEntity> LoadAllBy
-            (Func<TEntity, bool>
-            predicate)
+        public IEnumerable<TEntity> LoadAllBy(Func<TEntity, bool> predicate)
         {
             lock (this._lockObject)
             {
@@ -422,9 +439,7 @@ namespace XmlRepository
         /// Saves or updates the given entities.
         /// </summary>
         /// <param name="entities">The entities.</param>
-        public
-            void SaveOnSubmit
-            (IEnumerable<TEntity> entities)
+        public void SaveOnSubmit(IEnumerable<TEntity> entities)
         {
             lock (this._lockObject)
             {
@@ -441,10 +456,7 @@ namespace XmlRepository
         /// Deletes the entity with the given identity.
         /// </summary>
         /// <param name="identity">The identity.</param>
-        public
-            void DeleteOnSubmit
-            (TIdentity
-            identity)
+        public void DeleteOnSubmit(TIdentity identity)
         {
             try
             {
@@ -454,6 +466,7 @@ namespace XmlRepository
             {
                 throw new EntityNotFoundException(null, e);
             }
+
             this._isDirty = true;
         }
 
@@ -461,10 +474,7 @@ namespace XmlRepository
         /// Deletes the entities that match given predicate.
         /// </summary>
         /// <param name="predicate">The predicate.</param>
-        public
-            void DeleteOnSubmit
-            (Func<TEntity, bool>
-            predicate)
+        public void DeleteOnSubmit(Func<TEntity, bool> predicate)
         {
             lock (this._lockObject)
             {
@@ -480,9 +490,7 @@ namespace XmlRepository
         /// <summary>
         /// Deletes all entities.
         /// </summary>
-        public
-            void DeleteAllOnSubmit
-            ()
+        public void DeleteAllOnSubmit()
         {
             lock (this._lockObject)
             {
@@ -494,9 +502,7 @@ namespace XmlRepository
         /// <summary>
         /// Submits all changes to the repository so that the changes are persistent.
         /// </summary>
-        public
-            void SubmitChanges
-            ()
+        public void SubmitChanges()
         {
             lock (this._lockObject)
             {
@@ -515,9 +521,7 @@ namespace XmlRepository
         /// <summary>
         /// Discards all changes that have not yet been submitted.
         /// </summary>
-        public
-            void DiscardChanges
-            ()
+        public void DiscardChanges()
         {
             lock (this._lockObject)
             {
@@ -531,9 +535,7 @@ namespace XmlRepository
         /// <summary>
         /// Disposes the current instance and submits the changes.
         /// </summary>
-        public
-            void Dispose
-            ()
+        public void Dispose()
         {
             lock (this._lockObject)
             {
@@ -548,8 +550,7 @@ namespace XmlRepository
         /// A <see cref="T:System.Collections.Generic.IEnumerator`1"/> that can be used to iterate through the collection.
         /// </returns>
         /// <filterpriority>1</filterpriority>
-        public
-            IEnumerator<TEntity> GetEnumerator
+        public IEnumerator<TEntity> GetEnumerator
             ()
         {
             lock (this._lockObject)
