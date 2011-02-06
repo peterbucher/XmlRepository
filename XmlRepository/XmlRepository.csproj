@@ -61,8 +61,8 @@
     <Reference Include="cherryflavored.net">
       <HintPath>..\Referenced DLLs\cherryflavored.net\cherryflavored.net.dll</HintPath>
     </Reference>
-    <Reference Include="Newtonsoft.Json.Net35">
-      <HintPath>..\Referenced DLLs\Json.Net\Newtonsoft.Json.Net35.dll</HintPath>
+    <Reference Include="Newtonsoft.Json">
+      <HintPath>..\Referenced DLLs\Newtonsoft.Json\Newtonsoft.Json.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core">
