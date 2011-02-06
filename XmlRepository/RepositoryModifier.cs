@@ -1,12 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using XmlRepository.Contracts;
+using XmlRepository.Contracts.DataProviders;
 using XmlRepository.Contracts.Mapping;
 
 namespace XmlRepository
 {
     /// <summary>
-    /// Represents a repository selector.
+    /// Represents a repository modifier.
     /// </summary>
     /// <typeparam name="TEntity">The entity type.</typeparam>
     /// <typeparam name="TIdentity">The identity type.</typeparam>

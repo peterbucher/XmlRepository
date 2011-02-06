@@ -11,7 +11,7 @@ namespace XmlRepository.Mapping
         private IPropertyMapping _propertyMapping;
 
         /// <summary>
-        /// Initializes a new instance of <see cref="FluentPropertyMapping" />.
+        /// Initializes a new instance of <see pref="FluentPropertyMapping" />.
         /// </summary>
         /// <param name="propertyMapping">The property mapping to be used to set more mapping options.</param>
         public FluentPropertyMapping(IPropertyMapping propertyMapping)

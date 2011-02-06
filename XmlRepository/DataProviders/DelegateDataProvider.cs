@@ -1,5 +1,6 @@
 ﻿using System;
 using XmlRepository.Contracts;
+using XmlRepository.Contracts.DataProviders;
 
 namespace XmlRepository.DataProviders
 {

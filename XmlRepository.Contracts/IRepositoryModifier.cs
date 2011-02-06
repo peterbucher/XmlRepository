@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using XmlRepository.Contracts.DataProviders;
 using XmlRepository.Contracts.Mapping;
 
 namespace XmlRepository.Contracts

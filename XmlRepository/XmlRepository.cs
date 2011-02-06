@@ -7,6 +7,8 @@ using System.Xml.Linq;
 using cherryflavored.net;
 using XmlRepository.Contracts;
 using XmlRepository.Contracts.Mapping;
+using XmlRepository.Contracts.DataProviders;
+using XmlRepository.Contracts.DataSerializers;
 using XmlRepository.DataProviders;
 using XmlRepository.DataSerializers;
 using XmlRepository.Mapping;
@@ -538,8 +540,7 @@ namespace XmlRepository
         /// A <see cref="T:System.Collections.Generic.IEnumerator`1"/> that can be used to iterate through the collection.
         /// </returns>
         /// <filterpriority>1</filterpriority>
-        public IEnumerator<TEntity> GetEnumerator
-            ()
+        public IEnumerator<TEntity> GetEnumerator()
         {
             lock (this._lockObject)
             {

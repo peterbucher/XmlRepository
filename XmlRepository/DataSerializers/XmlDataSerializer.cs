@@ -1,5 +1,5 @@
 ﻿using System.Xml.Linq;
-using XmlRepository.Contracts;
+using XmlRepository.Contracts.DataSerializers;
 
 namespace XmlRepository.DataSerializers
 {

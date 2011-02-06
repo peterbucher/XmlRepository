@@ -7,7 +7,7 @@ namespace XmlRepository.Mapping
 {
     ///<summary>
     /// Represents a builder implementation for property mappings, which contains the start point "Map", for fluently configure mappings
-    /// and mapping options for a property of the given <see cref="TEntity" />.
+    /// and mapping options for a property of the given <see tref="TEntity" />.
     ///</summary>
     internal class PropertyMappingBuilder<TEntity> : IPropertyMappingBuilder<TEntity>
     {
@@ -22,7 +22,7 @@ namespace XmlRepository.Mapping
         }
 
         ///<summary>
-        /// Takes the selection of a property of given <see cref="TEntity" /> for further configuration.
+        /// Takes the selection of a property of given <see tref="TEntity" /> for further configuration.
         ///</summary>
         ///<param name="propertySelector">The selection as lambda expression, which tells to builder, which property should be mapped.</param>
         ///<typeparam name="TProperty">The property type to map.</typeparam>
