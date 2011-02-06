@@ -8,6 +8,7 @@ namespace XmlRepository.Contracts
     /// </summary>
     public interface IXmlRepository : IDisposable
     {
+
     }
 
     /// <summary>
@@ -15,7 +16,7 @@ namespace XmlRepository.Contracts
     /// </summary>
     /// <typeparam name="TEntity">The entity type.</typeparam>
     /// <typeparam name="TIdentity">The identity type.</typeparam>
-    public interface IXmlRepository<TEntity, TIdentity> : IXmlRepository, IEnumerable<TEntity> where TEntity: class, new()
+    public interface IXmlRepository<TEntity, TIdentity> : IXmlRepository, IEnumerable<TEntity> where TEntity : class, new()
     {
         /// <summary>
         /// Loads the entity with the given identity.

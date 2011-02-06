@@ -7,7 +7,7 @@ namespace XmlRepository.DataSerializers
     /// <summary>
     /// Serializes or deserializes an XElement to the appropriate format.
     /// </summary>
-    public class JsonDataSerializer : IDataSerializer
+    internal class JsonDataSerializer : IDataSerializer
     {
         /// <summary>
         /// Contains the lock object.

@@ -6,6 +6,7 @@ using System.Reflection;
 using System.Xml.Linq;
 using cherryflavored.net;
 using XmlRepository.Contracts;
+using XmlRepository.Contracts.Mapping;
 using XmlRepository.DataProviders;
 using XmlRepository.DataSerializers;
 using XmlRepository.Mapping;
@@ -25,12 +26,12 @@ namespace XmlRepository
         /// <summary>
         /// Contains a list of all repositories created so far, for reuse.
         /// </summary>
-        private static readonly IDictionary<Type, IXmlRepository> Repositories;
+        private static readonly IDictionary<RepositoryKey, IXmlRepository> Repositories;
 
         /// <summary>
         /// Contains a list of all propertymappings for each available repositorytype.
         /// </summary>
-        internal static readonly IDictionary<Type, List<PropertyMapping>> PropertyMappings;
+        internal static readonly IDictionary<Type, IList<IPropertyMapping>> PropertyMappings;
 
         /// <summary>
         /// Gets the name of the root element.
@@ -49,11 +50,7 @@ namespace XmlRepository
         /// <value>
         /// The name of the entity's property that is used as default key within queries.
         /// </value>
-        public static string DefaultQueryProperty
-        {
-            get;
-            set;
-        }
+        internal static readonly string DefaultQueryProperty = "Id";
 
         ///<summary>
         /// Gets or sets the data mapper. If not set, the ReflectionDataMapper is being used.
@@ -89,12 +86,21 @@ namespace XmlRepository
         /// </summary>
         static XmlRepository()
         {
-            Repositories = new Dictionary<Type, IXmlRepository>();
-            PropertyMappings = new Dictionary<Type, List<PropertyMapping>>();
+            Repositories = new Dictionary<RepositoryKey, IXmlRepository>();
+            PropertyMappings = new Dictionary<Type, IList<IPropertyMapping>>();
             DataMapper = new ReflectionDataMapper();
             DataSerializer = new XmlDataSerializer();
             DataProvider = new FileDataProvider(Environment.CurrentDirectory, ".xml");
-            DefaultQueryProperty = "Id";
+        }
+
+        /// <summary>
+        /// Gets a property mapping builder instance for a given entity type.
+        /// </summary>
+        /// <typeparam name="TEntity">The entity type which property mappings should be defined with the mapping builder.</typeparam>
+        /// <returns>A property mapping builder instance for the given entity type.</returns>
+        public static IPropertyMappingBuilder<TEntity> GetPropertyMappingBuilderFor<TEntity>()
+        {
+            return new PropertyMappingBuilder<TEntity>();
         }
 
         /// <summary>
@@ -104,72 +110,37 @@ namespace XmlRepository
         /// </summary>
         /// <typeparam name="TEntity">The entity type.</typeparam>
         /// <typeparam name="TIdentity">The identity type.</typeparam>
-        /// <param name="repositorySelector">The selector for entity type and identity type.</param>
+        /// <param name="repositoryModifier">The selector for entity type and identity type.</param>
         /// <returns>An xml repository.</returns>
-        public static IXmlRepository<TEntity, TIdentity> Get<TEntity, TIdentity>(IRepositorySelector<TEntity, TIdentity> repositorySelector) where TEntity : class, new()
+        public static IXmlRepository<TEntity, TIdentity> Get<TEntity, TIdentity>(IRepositoryModifier<TEntity, TIdentity> repositoryModifier) where TEntity : class, new()
         {
             lock (LockObject)
             {
-                // Get new instance, or if existing, with inmemory status.
-                return GetInternal(repositorySelector, false);
-            }
-        }
+                var key = new RepositoryKey
+                              {
+                                  RepositoryType = typeof (IXmlRepository<TEntity, TIdentity>),
+                                  DataProvider = repositoryModifier.DataProvider ?? DataProvider,
+                                  PropertyMappings = repositoryModifier.PropertyMappings ?? PropertyMappings,
+                                  QueryProperty = repositoryModifier.QueryProperty
+                              };
 
-        /// <summary>
-        /// Gets an xml repository, but in every case with discarded / clean instance status for the specified entity type. If the repository has not been
-        /// created yet, a new one is created; otherwise, the existing one is returned.
-        /// e.g. RepositoryFor{Test}.WithIdentity(p => p.Name) for a entity named 'Test' and a identity property named 'Name' which is typed as string.
-        /// </summary>
-        /// <typeparam name="TEntity">The entity type.</typeparam>
-        /// <typeparam name="TIdentity">The identity type.</typeparam>
-        /// <param name="repositorySelector">The selector for entity type and identity type.</param>
-        /// <returns>An xml repository.</returns>
-        public static IXmlRepository<TEntity, TIdentity> GetWithDiscardChanges<TEntity, TIdentity>(IRepositorySelector<TEntity, TIdentity> repositorySelector) where TEntity : class, new()
-        {
-            lock (LockObject)
-            {
-                // Get new instance, or if existing, with discarded inmemory status, which does call DiscardChanges on.
-                return GetInternal(repositorySelector, true);
-            }
-        }
+                IXmlRepository<TEntity, TIdentity> repository;
 
-        /// <summary>
-        /// Gets an xml repository for the specified entity type. If the repository has not been
-        /// created yet, a new one is created; otherwise, the existing one is returned.
-        /// e.g. RepositoryFor{Test}.WithIdentity(p => p.Name) for a entity named 'Test' and a identity property named 'Name' which is typed as string.
-        /// </summary>
-        /// <typeparam name="TEntity">The entity type.</typeparam>
-        /// <typeparam name="TIdentity">The identity type.</typeparam>
-        /// <param name="repositorySelector">The selector for entity type and identity type.</param>
-        /// <param name="discardChanges">Flag whether or not to discard the inmemory changes.</param>
-        /// <returns>An xml repository.</returns>
-        private static IXmlRepository<TEntity, TIdentity> GetInternal<TEntity, TIdentity>(IRepositorySelector<TEntity, TIdentity> repositorySelector, bool discardChanges) where TEntity : class, new()
-        {
-            lock (LockObject)
-            {
-                if (!Repositories.ContainsKey(typeof (TEntity)))
+                if (!Repositories.ContainsKey(key))
                 {
-                    var repository = new XmlRepository<TEntity, TIdentity>(repositorySelector.QueryProperty);
-                    Repositories.Add(typeof (TEntity), repository);
+                    repository = new XmlRepository<TEntity, TIdentity>(repositoryModifier);
+                    Repositories.Add(key, repository);
 
                     // Add default mappings.
                     AddDefaultPropertyMappingsFor(typeof (TEntity));
-
-                    // Return the requested repository to the caller.
-                    return repository;
                 }
                 else
                 {
-                    var repository = Repositories[typeof (TEntity)] as IXmlRepository<TEntity, TIdentity>;
-
-                    if (discardChanges)
-                    {
-                        repository.DiscardChanges();
-                    }
-
-                    // Return the requested repository to the caller.
-                    return repository;
+                    repository = Repositories[key] as IXmlRepository<TEntity, TIdentity>;
                 }
+
+                // Return the requested repository to the caller.
+                return repository;
             }
         }
 
@@ -194,14 +165,14 @@ namespace XmlRepository
         /// <param name="type">The type who is the mapping for.</param>
         /// <param name="mapping">The mapping for one property of the given type.</param>
         ///</summary>
-        public static void AddPropertyMappingFor(Type type, PropertyMapping mapping)
+        public static void AddPropertyMappingFor(Type type, IPropertyMapping mapping)
         {
             lock (LockObject)
             {
                 // If the mapping list for this member does not yet exist, create it.
                 if (!PropertyMappings.ContainsKey(type))
                 {
-                    PropertyMappings.Add(type, new List<PropertyMapping>());
+                    PropertyMappings.Add(type, new List<IPropertyMapping>());
                 }
 
                 // Do not override property mappings. (TODO: maybe a "Override" property on PropertyMappingType?)
@@ -231,6 +202,21 @@ namespace XmlRepository
         private readonly string _defaultQueryProperty;
 
         /// <summary>
+        /// Contains the property mappings that belongs to this instance.
+        /// </summary>
+        private readonly IDictionary<Type, IList<IPropertyMapping>> _propertyMappings;
+
+        /// <summary>
+        /// Contains the data provider that belongs to this instance.
+        /// </summary>
+        private readonly IDataProvider _dataProvider;
+
+        /// <summary>
+        /// Contains the data mapper that belongs to this instance.
+        /// </summary>
+        private readonly IDataMapper _dataMapper;
+
+        /// <summary>
         /// Contains the property info of the entity's property that is used as default key within
         /// queries.
         /// </summary>
@@ -250,13 +236,13 @@ namespace XmlRepository
         /// <summary>
         /// Creates a new instance of the <see cref="XmlRepository" /> type with a given query property.
         /// </summary>
-        /// <param name="queryProperty"></param>
-        internal XmlRepository(string queryProperty)
+        /// <param name="repositoryModifier">The repository modifier.</param>
+        internal XmlRepository(IRepositoryModifier<TEntity, TIdentity> repositoryModifier)
         {
             lock (this._lockObject)
             {
                 // Set up the default query property.
-                this._defaultQueryProperty = queryProperty ?? XmlRepository.DefaultQueryProperty;
+                this._defaultQueryProperty = repositoryModifier.QueryProperty ?? XmlRepository.DefaultQueryProperty;
                 this._defaultQueryPropertyInfo = typeof(TEntity).GetProperty(this._defaultQueryProperty);
 
                 // Check whether the default query property was found.
@@ -264,13 +250,17 @@ namespace XmlRepository
                 {
                     throw new Exception(
                         string.Format(
-                            "The property '{0}' has not been found on type '{1}' (is it missing, private, static or misspelled?)",
+                            "The identifier property '{0}' has not been found on type '{1}' (is it missing, private, static or misspelled?)",
                             this._defaultQueryProperty, typeof(TEntity).AssemblyQualifiedName));
                 }
 
+                this._propertyMappings = repositoryModifier.PropertyMappings ?? XmlRepository.PropertyMappings;
+                this._dataProvider = repositoryModifier.DataProvider ?? XmlRepository.DataProvider;
+                this._dataMapper = new ReflectionDataMapper();
+
                 // If the data source has been changed, reload the in-memory representation of the
                 // data source.
-                XmlRepository.DataProvider.DataSourceChanged +=
+                this._dataProvider.DataSourceChanged +=
                     (sender, eventArgs) =>
                     {
                         if (eventArgs.EntityType == typeof(TEntity).Name)
@@ -299,9 +289,7 @@ namespace XmlRepository
             {
                 try
                 {
-                    var idMapping = XmlRepository
-                        .PropertyMappings[typeof(TEntity)]
-                        .Single(m => m.Name == this._defaultQueryProperty);
+                    var idMapping = this._propertyMappings[typeof(TEntity)].Single(m => m.Name == this._defaultQueryProperty);
 
                     Func<XElement, bool> predicate;
 
@@ -511,7 +499,7 @@ namespace XmlRepository
                     return;
                 }
 
-                XmlRepository.DataProvider.Save<TEntity>(
+                this._dataProvider.Save<TEntity>(
                     XmlRepository.DataSerializer.Serialize(
                         this._rootElement));
                 this._isDirty = false;
@@ -527,7 +515,7 @@ namespace XmlRepository
             {
                 this._rootElement =
                     XmlRepository.DataSerializer.Deserialize(
-                        XmlRepository.DataProvider.Load<TEntity>());
+                        this._dataProvider.Load<TEntity>());
                 this._isDirty = false;
             }
         }

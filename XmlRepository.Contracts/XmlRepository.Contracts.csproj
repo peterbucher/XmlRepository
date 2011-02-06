@@ -10,7 +10,7 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>XmlRepository.Contracts</RootNamespace>
     <AssemblyName>XmlRepository.Contracts</AssemblyName>
-    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <TargetFrameworkProfile />
   </PropertyGroup>
@@ -73,12 +73,16 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="DataSourceChangedEventArgs.cs" />
-    <Compile Include="IDataMapper.cs" />
+    <Compile Include="Mapping\IDataMapper.cs" />
     <Compile Include="IDataProvider.cs" />
     <Compile Include="IDataSerializer.cs" />
-    <Compile Include="IRepositorySelector.cs" />
+    <Compile Include="Mapping\IFluentPropertyMapping.cs" />
+    <Compile Include="Mapping\IPropertyMapping.cs" />
+    <Compile Include="IRepositoryModifier.cs" />
     <Compile Include="IXmlRepository.cs" />
+    <Compile Include="Mapping\IPropertyMappingBuilder.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Mapping\XmlMappingType.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

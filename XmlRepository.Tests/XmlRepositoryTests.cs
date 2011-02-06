@@ -67,17 +67,24 @@ namespace XmlRepository.Tests
         {
             using (var repository = XmlRepository.Get(RepositoryFor<Person>.WithIdentity(p => p.Id)))
             {
-                var geekFriends = new List<Geek> { new Geek { Alias = "Peter" }, new Geek() { Alias = "Golo" } };
-                var personWithGeekFriends = new Person() { FirstName = "Roberto", Friends = geekFriends };
+                var geekFriends = new List<Geek>
+                                      {
+                                          new Geek { Alias = "Peter" },
+                                          new Geek() { Alias = "Golo" }
+                                      };
+
+                var robertoId = Guid.NewGuid();
+                var personWithGeekFriends = new Person
+                                                {
+                                                    Id = robertoId,
+                                                    FirstName = "Roberto", Friends = geekFriends
+                                                };
 
                 repository.SaveOnSubmit(personWithGeekFriends);
 
-                var all = repository.LoadAll();
-
-                var robertoWithGeeks = repository.LoadBy(p => p.FirstName == "Roberto");
-                var robertosFriends = robertoWithGeeks.Friends;
-
-                var test = repository.LoadBy(p => p.Friends != null && p.Friends.Count > 0);
+                Assert.That(repository.LoadAll().Count(), Is.EqualTo(1));
+                Assert.That(repository.LoadBy(p => p.Id == robertoId).Friends.Count, Is.EqualTo(2));
+                Assert.That(repository.LoadAll().Single().Friends[0].Alias, Is.EqualTo("Peter"));
             }
         }
 

@@ -1,22 +1,22 @@
-﻿namespace XmlRepository.Mapping
+﻿namespace XmlRepository.Contracts.Mapping
 {
     ///<summary>
-    /// Contains all possible places to map property content on.
+    /// Contains all possible xml places to map a property value to.
     ///</summary>
     public enum XmlMappingType
     {
         ///<summary>
-        /// Map content to xml subelement.
+        /// Map the property value to xml subelement.
         ///</summary>
         Element,
 
         ///<summary>
-        /// Map content to xml attribute.
+        /// Map the property value to xml attribute.
         ///</summary>
         Attribute,
 
         ///<summary>
-        /// Map content to xml content.
+        /// Map the property value to xml content.
         ///</summary>
         Content
     }

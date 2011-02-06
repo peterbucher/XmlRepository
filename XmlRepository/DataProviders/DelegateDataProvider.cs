@@ -41,7 +41,14 @@ namespace XmlRepository.DataProviders
         {
             lock (this._lockObject)
             {
-                return this._loadDelegate();
+                string loadingResult = this._loadDelegate();
+
+                if (!string.IsNullOrEmpty(loadingResult))
+                {
+                    return loadingResult;
+                }
+
+                return XmlRepository.RootElementXml;
             }
         }
 

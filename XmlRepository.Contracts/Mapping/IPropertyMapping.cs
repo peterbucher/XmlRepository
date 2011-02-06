@@ -1,46 +1,17 @@
-﻿using System;
-using System.Reflection;
-using XmlRepository.Contracts.Mapping;
-using XmlRepository.ExtensionMethods.System;
+using System;
 
-namespace XmlRepository.Mapping
+namespace XmlRepository.Contracts.Mapping
 {
     ///<summary>
     /// Contains a mapping for one class property to a xml representation.
     /// e.g. person.Name to <![CDATA[ <Person Name="Stefan"> ]]>
     ///</summary>
-    public class PropertyMapping : IPropertyMapping
+    public interface IPropertyMapping
     {
-        ///<summary>
-        /// Initializes a new instance of <see cref="PropertyMapping" />.
-        ///</summary>
-        public PropertyMapping()
-        {
-
-        }
-
-        ///<summary>
-        /// Initializes a new instance of <see cref="PropertyMapping" />.
-        ///</summary>
-        ///<param name="propertyInfo">The property info for fetching infos.</param>
-        public PropertyMapping(PropertyInfo propertyInfo)
-        {
-            this.PropertyType = propertyInfo.PropertyType;
-            this.EntityType = propertyInfo.DeclaringType;
-            this.Name = propertyInfo.Name;
-
-            this.IsClassPropertyType = this.PropertyType.IsClassType();
-
-            if (this.IsClassPropertyType)
-            {
-                this.IsGenericCollectionPropertyType = this.PropertyType.IsGenericCollectionType();
-            }
-        }
-
         ///<summary>
         /// Gets or sets the original name of the property.
         ///</summary>
-        public string Name
+        string Name
         {
             get;
             set;
@@ -49,7 +20,7 @@ namespace XmlRepository.Mapping
         ///<summary>
         /// Gets or sets optionally an alias for the property, to use within the xml representation.
         ///</summary>
-        public string Alias
+        string Alias
         {
             get;
             set;
@@ -59,28 +30,25 @@ namespace XmlRepository.Mapping
         /// Gets rather the alias, if there is one, otherwise, the original property name.
         /// (To be used in all xml creating).
         ///</summary>
-        public string MappedName
+        string MappedName
         {
-            get
-            {
-                return this.Alias ?? this.Name;
-            }
+            get;
         }
 
         ///<summary>
         /// Gets or sets the <see cref="XmlMappingType" /> which describes in
         /// what kind of xml representation this property content should go, for e.g. element, attribute, content.
         ///</summary>
-        public XmlMappingType XmlMappingType
+        XmlMappingType XmlMappingType
         {
             get;
             set;
         }
 
         ///<summary>
-        /// Gets or sets the entity type, which declares the property that this <see cref="PropertyMapping" /> is representing.
+        /// Gets or sets the entity type, which declares the property that this <see pref="PropertyMapping" /> is representing.
         ///</summary>
-        public Type EntityType
+        Type EntityType
         {
             get;
             set;
@@ -89,7 +57,7 @@ namespace XmlRepository.Mapping
         ///<summary>
         /// Gets or sets the property type, that maps to xml.
         ///</summary>
-        public Type PropertyType
+        Type PropertyType
         {
             get;
             set;
@@ -98,7 +66,7 @@ namespace XmlRepository.Mapping
         /// <summary>
         /// Gets or sets whether the <see cref="PropertyType" /> is a class.
         /// </summary>
-        public bool IsClassPropertyType
+        bool IsClassPropertyType
         {
             get;
             set;
@@ -107,7 +75,7 @@ namespace XmlRepository.Mapping
         ///<summary>
         /// Gets or sets whether the <see cref="PropertyType" /> is a generic collection.
         ///</summary>
-        public bool IsGenericCollectionPropertyType
+        bool IsGenericCollectionPropertyType
         {
             get;
             set;

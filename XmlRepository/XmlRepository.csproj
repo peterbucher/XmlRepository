@@ -10,7 +10,7 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>XmlRepository</RootNamespace>
     <AssemblyName>XmlRepository</AssemblyName>
-    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <IsWebBootstrapper>false</IsWebBootstrapper>
     <StartupObject>
@@ -46,7 +46,7 @@
     <WarningLevel>4</WarningLevel>
     <DocumentationFile>bin\Debug\XmlRepository.xml</DocumentationFile>
     <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
-    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -100,14 +100,13 @@
     <Reference Include="System.Core">
       <RequiredTargetFramework>4.0</RequiredTargetFramework>
     </Reference>
-    <Reference Include="System.Xml.Linq">
-      <RequiredTargetFramework>4.0</RequiredTargetFramework>
-    </Reference>
     <Reference Include="System.Xml" />
+    <Reference Include="System.Xml.Linq" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ExtensionMethods\System\ExtensionMethods.cs" />
-    <Compile Include="Mapping\XmlMappingType.cs" />
+    <Compile Include="Mapping\FluentPropertyMapping.cs" />
+    <Compile Include="Mapping\PropertyMappingBuilder.cs" />
     <Compile Include="Mapping\ReflectionDataMapper.cs" />
     <Compile Include="DataProviders\InMemoryDataProvider.cs" />
     <Compile Include="DataProviders\DelegateDataProvider.cs" />
@@ -119,7 +118,8 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="DataProviders\FileDataProvider.cs" />
     <Compile Include="RepositoryFor.cs" />
-    <Compile Include="RepositorySelector.cs" />
+    <Compile Include="RepositoryKey.cs" />
+    <Compile Include="RepositoryModifier.cs" />
     <Compile Include="XmlRepository.cs" />
   </ItemGroup>
   <ItemGroup>

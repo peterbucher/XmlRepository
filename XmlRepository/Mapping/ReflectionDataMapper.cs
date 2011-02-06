@@ -2,8 +2,8 @@
 using System.Collections;
 using System.Reflection;
 using System.Xml.Linq;
-using XmlRepository.Contracts;
 using System.Collections.Generic;
+using XmlRepository.Contracts.Mapping;
 
 namespace XmlRepository.Mapping
 {
@@ -13,6 +13,26 @@ namespace XmlRepository.Mapping
     /// </summary>
     internal class ReflectionDataMapper : IDataMapper
     {
+        public ReflectionDataMapper()
+        {
+            this.PropertyMappings = XmlRepository.PropertyMappings;
+        }
+
+        public ReflectionDataMapper(IDictionary<Type, IList<IPropertyMapping>> propertyMappings)
+        {
+            this.PropertyMappings = propertyMappings;
+        }
+
+
+        ///<summary>
+        /// Gets or sets the property mappings that belongs to a specific XmlRepository instance.
+        ///</summary>
+        public IDictionary<Type, IList<IPropertyMapping>> PropertyMappings
+        {
+            get;
+            set;
+        }
+
         public XElement ToXElement<TEntity>(TEntity entity) where TEntity : new()
         {
             return ToXElement(entity, typeof(TEntity));
@@ -21,7 +41,8 @@ namespace XmlRepository.Mapping
         protected XElement ToXElement(object entity, Type entityType)
         {
             XmlRepository.AddDefaultPropertyMappingsFor(entityType);
-            var mappings = XmlRepository.PropertyMappings[entityType];
+
+            var mappings = this.PropertyMappings[entityType];
 
             var element = this.CreateElement(entityType.Name);
 
@@ -60,6 +81,7 @@ namespace XmlRepository.Mapping
                             {
                                 element.Add(this.ToXElement(propertyObjectValue, mapping.PropertyType));
                             }
+
                             continue;
                         }
 
@@ -96,7 +118,9 @@ namespace XmlRepository.Mapping
         protected object ToObject(XElement entityElement, Type entityType)
         {
             XmlRepository.AddDefaultPropertyMappingsFor(entityType);
-            var mappings = XmlRepository.PropertyMappings[entityType];
+
+            var propertyMappings = this.PropertyMappings ?? XmlRepository.PropertyMappings;
+            var mappings = propertyMappings[entityType];
 
             object entity = Activator.CreateInstance(entityType);
 
@@ -162,9 +186,11 @@ namespace XmlRepository.Mapping
                                  Activator.CreateInstance(typeof(List<>).MakeGenericType(entityItemType)));
                         }
 
-                        if (entityElement.Element(mapping.MappedName).HasElements)
+                        var collectionElement = entityElement.Element(mapping.MappedName);
+
+                        if (collectionElement.HasElements)
                         {
-                            foreach (var element in entityElement.Element(mapping.Name).Elements())
+                            foreach (var element in collectionElement.Elements())
                             {
                                 entityList.Add(this.ToObject(element, entityItemType));
                             }

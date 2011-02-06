@@ -1,12 +1,23 @@
-﻿using System.Xml.Linq;
+﻿using System;
+using System.Collections.Generic;
+using System.Xml.Linq;
 
-namespace XmlRepository.Contracts
+namespace XmlRepository.Contracts.Mapping
 {
     /// <summary>
     /// Maps the data of a XElement to an object and vice versa.
     /// </summary>
     public interface IDataMapper
     {
+        ///<summary>
+        /// Gets or sets the property mappings that belongs to a specific XmlRepository instance.
+        ///</summary>
+        IDictionary<Type, IList<IPropertyMapping>> PropertyMappings
+        {
+            get;
+            set;
+        }
+
         /// <summary>
         /// Maps the given object to a xml-dom.
         /// </summary>

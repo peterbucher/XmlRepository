@@ -32,7 +32,10 @@ namespace XmlRepository.DataProviders
         /// </summary>
         public InMemoryDataProvider(string initialDataContent)
         {
-            this._dataContent = initialDataContent;
+            if(!string.IsNullOrEmpty(initialDataContent))
+            {
+                this._dataContent = initialDataContent;
+            }
         }
 
         /// <summary>
