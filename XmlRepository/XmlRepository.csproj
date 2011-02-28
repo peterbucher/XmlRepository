@@ -46,7 +46,7 @@
     <WarningLevel>4</WarningLevel>
     <DocumentationFile>bin\Debug\XmlRepository.xml</DocumentationFile>
     <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
-    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -86,9 +86,9 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="DataProviders\FileDataProvider.cs" />
     <Compile Include="RepositoryFor.cs" />
-    <Compile Include="RepositoryKey.cs" />
     <Compile Include="RepositoryModifier.cs" />
     <Compile Include="XmlRepository.cs" />
+    <Compile Include="XmlRepository`2.cs" />
   </ItemGroup>
   <ItemGroup>
     <BootstrapperPackage Include="Microsoft.Net.Client.3.5">
@@ -128,7 +128,6 @@
       <Name>XmlRepository.Contracts</Name>
     </ProjectReference>
   </ItemGroup>
-  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

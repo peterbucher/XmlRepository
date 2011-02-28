@@ -63,7 +63,12 @@ namespace XmlRepository.Mapping
         {
             get
             {
-                return this.Alias ?? this.Name;
+                if(string.IsNullOrEmpty(this.Alias))
+                {
+                    return this.Name;
+                }
+
+                return this.Alias;
             }
         }
 

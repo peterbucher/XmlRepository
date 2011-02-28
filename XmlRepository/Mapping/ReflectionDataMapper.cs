@@ -11,19 +11,8 @@ namespace XmlRepository.Mapping
     /// Provides methods to build conversion methods for T-to-XElement conversion for arbitrary
     /// types T, and vice-versa.
     /// </summary>
-    internal class ReflectionDataMapper : IDataMapper
+    public class ReflectionDataMapper : IDataMapper
     {
-        public ReflectionDataMapper()
-        {
-            this.PropertyMappings = XmlRepository.PropertyMappings;
-        }
-
-        public ReflectionDataMapper(IDictionary<Type, IList<IPropertyMapping>> propertyMappings)
-        {
-            this.PropertyMappings = propertyMappings;
-        }
-
-
         ///<summary>
         /// Gets or sets the property mappings that belongs to a specific XmlRepository instance.
         ///</summary>
@@ -33,14 +22,25 @@ namespace XmlRepository.Mapping
             set;
         }
 
+        /// <summary>
+        /// Maps the given object to a xml-dom.
+        /// </summary>
+        /// <param name="entity">The entity as object.</param>
+        /// <returns>The XElement filled with data from the given entity..</returns>
         public XElement ToXElement<TEntity>(TEntity entity) where TEntity : new()
         {
             return ToXElement(entity, typeof(TEntity));
         }
 
+        /// <summary>
+        /// Maps the given object to a xml-dom.
+        /// </summary>
+        /// <param name="entity">The entity as object.</param>
+        /// <param name="entityType">The entiy type.</param>
+        /// <returns>The XElement filled with data from the given entity..</returns>
         protected XElement ToXElement(object entity, Type entityType)
         {
-            XmlRepository.AddDefaultPropertyMappingsFor(entityType);
+            XmlRepository.AddDefaultPropertyMappingsFor(entityType, this.PropertyMappings);
 
             var mappings = this.PropertyMappings[entityType];
 
@@ -50,7 +50,7 @@ namespace XmlRepository.Mapping
             {
                 Func<string> valueGetter =
                     () =>
-                    this.GetStringValueOrEmptyString(mapping.EntityType.GetProperty(mapping.Name).GetValue(entity, null));
+                    GetStringValueOrEmptyString(mapping.EntityType.GetProperty(mapping.Name).GetValue(entity, null));
 
                 switch (mapping.XmlMappingType)
                 {
@@ -110,14 +110,25 @@ namespace XmlRepository.Mapping
             return element;
         }
 
+        /// <summary>
+        /// Maps the given XElement that represents one node to a object.
+        /// </summary>
+        /// <param name="entityElement">The root element.</param>
+        /// <returns>The object filled with the data of given XElement.</returns>
         public TEntity ToObject<TEntity>(XElement entityElement) where TEntity : new()
         {
             return (TEntity)this.ToObject(entityElement, typeof(TEntity));
         }
 
+        /// <summary>
+        /// Maps the given XElement that represents one node to a object.
+        /// </summary>
+        /// <param name="entityElement">The root element.</param>
+        /// <param name="entityType">The entiy type.</param>
+        /// <returns>The object filled with the data of given XElement.</returns>
         protected object ToObject(XElement entityElement, Type entityType)
         {
-            XmlRepository.AddDefaultPropertyMappingsFor(entityType);
+            XmlRepository.AddDefaultPropertyMappingsFor(entityType, this.PropertyMappings);
 
             var propertyMappings = this.PropertyMappings ?? XmlRepository.PropertyMappings;
             var mappings = propertyMappings[entityType];
@@ -129,7 +140,7 @@ namespace XmlRepository.Mapping
                 Action<string> valueSetter =
                     value =>
                     mapping.EntityType.GetProperty(mapping.Name).SetValue(entity,
-                                                                          this.GetConvertedValue(mapping.PropertyType,
+                                                                          GetConvertedValue(mapping.PropertyType,
                                                                                                  value), null);
 
                 switch (mapping.XmlMappingType)
@@ -205,10 +216,17 @@ namespace XmlRepository.Mapping
             return entity;
         }
 
+        // Cached ToOrDefault-method.
         internal static readonly MethodInfo ToOrDefaultMethod =
             typeof(cherryflavored.net.ExtensionMethods.System.ExtensionMethods).GetMethod("ToOrDefault", new[] { typeof(string) });
 
-        private object GetConvertedValue(Type type, string value)
+        /// <summary>
+        /// General type convertion.
+        /// </summary>
+        /// <param name="type">The type in which the value to be parsed / converted.</param>
+        /// <param name="value">The value as string.</param>
+        /// <returns>The parsed / converted value.</returns>
+        private static object GetConvertedValue(Type type, string value)
         {
             // If the property type is an enumeration or of type datetime, use the ToOrDefault method
             // to convert without an exception. So there are null values valid.
@@ -221,16 +239,32 @@ namespace XmlRepository.Mapping
             return Convert.ChangeType(value, type);
         }
 
-        private string GetStringValueOrEmptyString(object propertyValueAsObject)
+        /// <summary>
+        /// Gets the value as string or an empty string if the value is null.
+        /// </summary>
+        /// <param name="propertyValueAsObject">The object to be represent in a string.</param>
+        /// <returns>The string representation of the value.</returns>
+        private static string GetStringValueOrEmptyString(object propertyValueAsObject)
         {
             return propertyValueAsObject != null ? propertyValueAsObject.ToString() : string.Empty;
         }
 
+        /// <summary>
+        /// Creates a new <see cref="XElement" />.
+        /// </summary>
+        /// <param name="name">The name.</param>
+        /// <returns>The <see cref="XElement" />.</returns>
         private XElement CreateElement(XName name)
         {
             return this.CreateElement(name, null);
         }
 
+        /// <summary>
+        /// Creates a new <see cref="XElement" />.
+        /// </summary>
+        /// <param name="name">The name.</param>
+        /// <param name="content">The content to be added to the <see cref="XElement" />.</param>
+        /// <returns>The <see cref="XElement" />.</returns>
         private XElement CreateElement(XName name, object content)
         {
             if (content == null)

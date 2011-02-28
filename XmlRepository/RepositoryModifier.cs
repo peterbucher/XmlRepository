@@ -38,6 +38,8 @@ namespace XmlRepository
         ///<returns>The repository modifier for further modification.</returns>
         public IRepositoryModifier<TEntity, TIdentity> WithMappings(IDictionary<Type, IList<IPropertyMapping>> propertyMappings)
         {
+            XmlRepository.AddDefaultPropertyMappingsFor(typeof (TEntity), propertyMappings);
+
             this.PropertyMappings = propertyMappings;
             return this;
         }

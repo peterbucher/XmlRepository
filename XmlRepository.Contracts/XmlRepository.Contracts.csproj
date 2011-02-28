@@ -42,6 +42,7 @@
   <ItemGroup>
     <Compile Include="DataProviders\DataSourceChangedEventArgs.cs" />
     <Compile Include="DataProviders\IDataProvider.cs" />
+    <Compile Include="IXmlRepository`2.cs" />
     <Compile Include="Mapping\IDataMapper.cs" />
     <Compile Include="DataSerializers\IDataSerializer.cs" />
     <Compile Include="Mapping\IFluentPropertyMapping.cs" />
@@ -51,6 +52,7 @@
     <Compile Include="Mapping\IPropertyMappingBuilder.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Mapping\XmlMappingType.cs" />
+    <Compile Include="RepositoryKey.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

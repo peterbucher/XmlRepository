@@ -3,12 +3,12 @@ using System.Collections.Generic;
 using XmlRepository.Contracts.DataProviders;
 using XmlRepository.Contracts.Mapping;
 
-namespace XmlRepository
+namespace XmlRepository.Contracts
 {
     /// <summary>
     /// Represents a key for a specific repository.
     /// </summary>
-    internal class RepositoryKey
+    public class RepositoryKey
     {
         /// <summary>
         /// Gets or sets the repository type.
@@ -74,7 +74,7 @@ namespace XmlRepository
         /// <returns><true /> if the keys equals each other, otherwise false.</returns>
         public static bool Equals(RepositoryKey obj1, RepositoryKey obj2)
         {
-            if ((object.Equals(null, obj1) || object.Equals(null, obj2)) || (obj1.GetType() != obj2.GetType()))
+            if((object.Equals(null, obj1) || object.Equals(null, obj2)) || (obj1.GetType() != obj2.GetType()))
             {
                 return false;
             }
@@ -95,7 +95,12 @@ namespace XmlRepository
         {
             int hashCode = this.RepositoryType.GetHashCode();
 
-            if (this.QueryProperty != null)
+            if(this.DataProvider != null)
+            {
+                hashCode ^= this.DataProvider.GetHashCode();
+            }
+
+            if(this.QueryProperty != null)
             {
                 hashCode ^= this.QueryProperty.GetHashCode();
             }

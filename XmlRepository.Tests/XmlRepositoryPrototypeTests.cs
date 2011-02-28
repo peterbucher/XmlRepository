@@ -16,7 +16,10 @@ namespace XmlRepository.Tests
         [Test]
         public void SupportOneToManyAndManyToOneThroughtInteractionOfMultipleRepositoriesWithinARepository()
         {
-            var articleInBothCategories = new Article {Title = "Lambda auf Abwegen"};
+            var articleInBothCategories = new Article
+            {
+                Title = "Lambda auf Abwegen"
+            };
 
             var articlesOne = new List<Article>
                                {
@@ -32,10 +35,10 @@ namespace XmlRepository.Tests
                                    new Article {Title = "Kren fllen"}
                                };
 
-            var categoryOne = new ArticleCategory {Name = "One"};
-            var categoryTwo = new ArticleCategory {Name = "Two"};
-
-            string content = null;
+            var categoryOne = new ArticleCategory
+            {
+                Name = "One"
+            };
 
             using(var repository = XmlRepository.Get(RepositoryFor<ArticleCategory>
                 .WithIdentity(c => c.Id)
@@ -78,7 +81,7 @@ namespace XmlRepository.Tests
         [Test]
         public void MappingBuilderAbstractionIntegration()
         {
-            using (var builder = XmlRepository.GetPropertyMappingBuilderFor<Person>())
+            using(var builder = XmlRepository.GetPropertyMappingBuilderFor<Person>())
             {
                 builder.Map(p => p.Id).ToAttribute("sexy");
                 builder.Map(p => p.LastName).ToContent();
@@ -91,13 +94,17 @@ namespace XmlRepository.Tests
             var delegateProvider = new DelegateDataProvider(() => xml, data => xml = data);
             XmlRepository.DataProvider = delegateProvider;
 
-            using (var repository = XmlRepository.Get(RepositoryFor<Person>.WithIdentity(p => p.Id)))
+            using(var repository = XmlRepository.Get(RepositoryFor<Person>.WithIdentity(p => p.Id)))
             {
                 var person = new Person
                                  {
                                      FirstName = "Peter&",
                                      LastName = "Bucher",
-                                     Geek = new Geek { Alias = "YeahAlias", SuperId = "test" }
+                                     Geek = new Geek
+                                     {
+                                         Alias = "YeahAlias",
+                                         SuperId = "test"
+                                     }
                                  };
 
                 repository.SaveOnSubmit(person);
@@ -134,7 +141,7 @@ namespace XmlRepository.Tests
   </Person>
 </root>");
 
-            using (var repository = XmlRepository.Get(RepositoryFor<Person>
+            using(var repository = XmlRepository.Get(RepositoryFor<Person>
                 .WithIdentity(p => p.Id)
                 .WithDataProvider(prefilledInMemoryProvider)))
             {
@@ -171,12 +178,15 @@ namespace XmlRepository.Tests
 
             XmlRepository.AddPropertyMappingFor(typeof(Geek), a);
 
-            using (var repository = XmlRepository
+            using(var repository = XmlRepository
                 .Get(RepositoryFor<Person>
                 .WithIdentity(p => p.Id)
                 .WithDataProvider(new InMemoryDataProvider())))
             {
-                var geek = new Geek { Alias = "Jackal" };
+                var geek = new Geek
+                {
+                    Alias = "Jackal"
+                };
 
                 var peter = new Person
                                 {
@@ -202,12 +212,18 @@ namespace XmlRepository.Tests
         [Test]
         public void Foo()
         {
-            using (var repository = XmlRepository.Get(RepositoryFor<Person>
+            using(var repository = XmlRepository.Get(RepositoryFor<Person>
                 .WithIdentity(p => p.Id)
                 .WithDataProvider(new InMemoryDataProvider())))
             {
-                repository.SaveOnSubmit(new Person() { FirstName = "Peter" });
-                repository.SaveOnSubmit(new Person() { FirstName = "Golo" });
+                repository.SaveOnSubmit(new Person()
+                {
+                    FirstName = "Peter"
+                });
+                repository.SaveOnSubmit(new Person()
+                {
+                    FirstName = "Golo"
+                });
 
                 var test = repository.LoadAll();
                 var peter = repository.LoadBy(p => p.FirstName == "Peter");
@@ -216,6 +232,37 @@ namespace XmlRepository.Tests
 
                 var test2 = repository.LoadAll();
             }
+        }
+
+        [Test]
+        public void sdfsdfsdf()
+        {
+            var repository = XmlRepository.Get(RepositoryFor<Person>
+                                                   .WithIdentity(p => p.Id)
+                                                   .WithDataProvider(new InMemoryDataProvider()));
+
+            repository.SaveOnSubmit(new Person()
+                                        {
+                                            FirstName = "Peter"
+                                        });
+            repository.SaveOnSubmit(new Person()
+                                        {
+                                            FirstName = "Golo"
+                                        });
+
+            var test = repository.LoadAll();
+            var peter = repository.LoadBy(p => p.FirstName == "Peter");
+
+            repository.DeleteOnSubmit(p => p.FirstName == "Peter");
+
+            var test2 = repository.LoadAll();
+
+            repository.SubmitChanges();
+
+            repository.DataProvider = new InMemoryDataProvider();
+
+            var sdfsdsdf = XmlRepository.Get(RepositoryFor<Person>
+                                                   .WithIdentity(p => p.Id));
         }
     }
 }

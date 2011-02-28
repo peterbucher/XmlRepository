@@ -1,5 +1,4 @@
 ﻿using System;
-using XmlRepository.Contracts;
 using XmlRepository.Contracts.DataProviders;
 
 namespace XmlRepository.DataProviders
@@ -17,12 +16,12 @@ namespace XmlRepository.DataProviders
         /// <summary>
         /// Contains the load delegate.
         /// </summary>
-        private readonly Func<string> _loadDelegate;
+        private Func<string> _loadDelegate;
 
         /// <summary>
         /// Contains the save delegate.
         /// </summary>
-        private readonly Action<string> _saveDelegate;
+        private Action<string> _saveDelegate;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="InMemoryDataProvider" /> type.
@@ -81,6 +80,16 @@ namespace XmlRepository.DataProviders
             {
                 handler(this, DataSourceChangedEventArgs.Empty);
             }
+        }
+
+        /// <summary>
+        /// Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.
+        /// </summary>
+        /// <filterpriority>2</filterpriority>
+        public void Dispose()
+        {
+            this._loadDelegate = null;
+            this._saveDelegate = null;
         }
     }
 }

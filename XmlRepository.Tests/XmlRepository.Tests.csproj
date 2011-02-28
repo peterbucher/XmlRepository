@@ -95,6 +95,9 @@
     <Reference Include="System.Xml.Linq" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="DataProviders\DelegateDataProviderTest.cs" />
+    <Compile Include="DataProviders\FileDataProviderTest.cs" />
+    <Compile Include="DataProviders\InMemoryDataProviderTest.cs" />
     <Compile Include="Entities\Article.cs" />
     <Compile Include="Entities\ArticleCategory.cs" />
     <Compile Include="Entities\Geek.cs" />

@@ -31,8 +31,9 @@ namespace XmlRepository.DataProviders
         /// <param name="initialDataContent">Initial data for the data provider.</param>
         /// </summary>
         public InMemoryDataProvider(string initialDataContent)
+            : this()
         {
-            if(!string.IsNullOrEmpty(initialDataContent))
+            if (!string.IsNullOrEmpty(initialDataContent))
             {
                 this._dataContent = initialDataContent;
             }
@@ -79,6 +80,15 @@ namespace XmlRepository.DataProviders
             {
                 handler(this, DataSourceChangedEventArgs.Empty);
             }
+        }
+
+        /// <summary>
+        /// Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.
+        /// </summary>
+        /// <filterpriority>2</filterpriority>
+        public void Dispose()
+        {
+            this._dataContent = null;
         }
     }
 }

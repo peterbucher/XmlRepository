@@ -7,8 +7,13 @@ namespace XmlRepository.DataSerializers
     /// <summary>
     /// Serializes or deserializes an XElement to the appropriate format.
     /// </summary>
-    public class JsonDataSerializer : IDataSerializer
+    internal class JsonDataSerializer : IDataSerializer
     {
+        /// <summary>
+        /// Contains the lock object.
+        /// </summary>
+        private readonly object _lockObject = new object();
+
         /// <summary>
         /// Serializes the given root element.
         /// </summary>
@@ -16,7 +21,10 @@ namespace XmlRepository.DataSerializers
         /// <returns>The serialized string representation.</returns>
         public string Serialize(XElement rootElement)
         {
-            return JsonConvert.SerializeXNode(rootElement, Formatting.Indented);
+            lock (this._lockObject)
+            {
+                return JsonConvert.SerializeXNode(rootElement, Formatting.Indented);
+            }
         }
 
         /// <summary>
@@ -26,12 +34,15 @@ namespace XmlRepository.DataSerializers
         /// <returns>An XElement.</returns>
         public XElement Deserialize(string content)
         {
-                if(content.Length <= XmlRepository.RootElementXml.Length)
+            lock (this._lockObject)
+            {
+                if (content.Length <= XmlRepository.RootElementXml.Length)
                 {
                     return new XElement(XmlRepository.RootElementXml);
                 }
 
                 return JsonConvert.DeserializeXNode(content, XmlRepository.RootElementName).Root;
+            }
         }
     }
 }

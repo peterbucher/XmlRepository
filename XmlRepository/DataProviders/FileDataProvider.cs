@@ -77,7 +77,7 @@ namespace XmlRepository.DataProviders
         protected virtual void OnDataSourceChanged(string dataFile)
         {
             var handler = this.DataSourceChanged;
-            if(handler != null)
+            if (handler != null)
             {
                 handler(this, new DataSourceChangedEventArgs(dataFile.Substring(0, dataFile.Length - this._dataFileExtension.Length)));
             }
@@ -87,8 +87,17 @@ namespace XmlRepository.DataProviders
         {
             lock (this._lockObject)
             {
-                return Path.Combine(this._dataPath, String.Concat(typeof (TEntity).Name, this._dataFileExtension));
+                return Path.Combine(this._dataPath, String.Concat(typeof(TEntity).Name, this._dataFileExtension));
             }
+        }
+
+        /// <summary>
+        /// Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.
+        /// </summary>
+        /// <filterpriority>2</filterpriority>
+        public void Dispose()
+        {
+            this._fileSystemWatcher.Dispose();
         }
     }
 }

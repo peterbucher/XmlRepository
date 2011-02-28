@@ -5,7 +5,7 @@ namespace XmlRepository.Contracts.DataProviders
     /// <summary>
     /// Provides access to a data sources.
     /// </summary>
-    public interface IDataProvider
+    public interface IDataProvider : IDisposable
     {
         /// <summary>
         /// Loads the data source and returns its content.
