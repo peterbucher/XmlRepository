@@ -108,6 +108,10 @@
       <Project>{D767D082-CF51-449C-963C-BCBC8CF6BB9E}</Project>
       <Name>XmlRepository.Contracts</Name>
     </ProjectReference>
+    <ProjectReference Include="..\XmlRepository\XmlRepository.csproj">
+      <Project>{78BD1D21-0F16-43E5-AD49-1B0991114D30}</Project>
+      <Name>XmlRepository</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
