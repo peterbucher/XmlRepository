@@ -11,13 +11,13 @@
 		<meta name="keywords" content=".NET, C#, XML, repository, data, speichern, save, store, serialisieren, serialize" />
 		<meta name="robots" content="index, follow" />
 
-		<link rel="icon" type="image/x-icon" href="/favicon.ico" />
-		<link rel="shortcut icon" type="image/x-icon" href="/favicon.ico" />
+        <link rel="icon" type="image/png" sizes="192x192" href="android-icon-192x192.png?t=2016" />
+        <link rel="shortcut icon" href="favicon.ico?t=2016" />
 		
-        <link rel="stylesheet" type="text/css" href="/Styles/Layout.css" />
-		<link rel="stylesheet" type="text/css" href="/Styles/Base.css" />
+        <link rel="stylesheet" type="text/css" href="Styles/Layout.css" />
+		<link rel="stylesheet" type="text/css" href="Styles/Base.css" />
 
-        <script src="/Scripts/jquery-1.4.2.min.js" type="text/javascript"></script>
+        <script src="Scripts/jquery-1.4.2.min.js" type="text/javascript"></script>
 
         <title>xmlrepository.ch</title>
         
@@ -54,12 +54,12 @@
                     &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}<br />
                     &nbsp;&nbsp;&nbsp;&nbsp;]]&gt;&lt;/example&gt;<br /><br />
                     &nbsp;&nbsp;&nbsp;&nbsp;&lt;downloads&gt;<br />
-                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;download file="<a href="/Downloads/xmlrepository-v1.1-net35.zip">assembly</a>" version="1.1" platform="net35" type="application/zip" /&gt;<br />
-                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;download file="<a href="https://goloroden.kilnhg.com/Project/23/xmlrepository-ch">source</a>" version="current" platform="net35" type="mercurial" /&gt;<br />
+                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;download file="<a href="Downloads/xmlrepository-v1.1-net35.zip">assembly</a>" version="1.1" platform="net35" type="application/zip" /&gt;<br />
+                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;download file="<a href="https://peterbucher.kilnhg.com/Code/xmlrepository-ch/Group/Default" target="_blank">source</a>" version="current" platform="net35" type="mercurial" /&gt;<br />
                     &nbsp;&nbsp;&nbsp;&nbsp;&lt;/downloads&gt;<br /><br />
                     &nbsp;&nbsp;&nbsp;&nbsp;&lt;documentation /&gt;<br /><br />
                     &nbsp;&nbsp;&nbsp;&nbsp;&lt;copyright&gt;&lt;![CDATA[<br />
-                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&copy; Copyright 2009-<%= DateTime.Now.Year %> <a href="http://www.goloroden.de">Golo Roden</a> und <a href="http://www.peterbucher.ch">Peter Bucher</a>. Alle Rechte vorbehalten.<br />
+                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&copy; Copyright 2009-<%= DateTime.Now.Year %> <a href="http://www.goloroden.de" target="_blank">Golo Roden</a> und <a href="http://www.peterbucher.ch" target="_blank">Peter Bucher</a>. Alle Rechte vorbehalten.<br />
                     &nbsp;&nbsp;&nbsp;&nbsp;]]&gt;&lt;/copyright&gt;<br />
                     &lt;/xmlrepository.ch&gt;
                 </p>

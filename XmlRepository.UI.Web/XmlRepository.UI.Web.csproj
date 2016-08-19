@@ -18,6 +18,7 @@
     </UpgradeBackupLocation>
     <OldToolsVersion>3.5</OldToolsVersion>
     <TargetFrameworkProfile />
+    <UseIISExpress>false</UseIISExpress>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -78,7 +79,9 @@
     <Reference Include="System.Xml.Linq" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="android-icon-192x192.png" />
     <Content Include="Default.aspx" />
+    <Content Include="favicon.ico" />
     <Content Include="Scripts\jquery-1.4.2.min.js" />
     <Content Include="Styles\Base.css" />
     <Content Include="Styles\Layout.css" />
@@ -102,6 +105,9 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="Downloads\xmlrepository-v1.0-net35.zip" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Properties\PublishProfiles\LocalDeploy to D--Deploy-xmlrepository.ch.pubxml" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v10.0\WebApplications\Microsoft.WebApplication.targets" />
