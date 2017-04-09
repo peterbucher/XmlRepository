@@ -1,0 +1,12 @@
+*/**/bin
+*/**/bin/Debug
+*/**/bin/Release
+*/**/obj/Debug
+*/**/obj/Release
+*.user
+*.suo
+syntax:glob
+*bin/*
+*obj/*
+_ReSharper*
+*_ReSharper*
