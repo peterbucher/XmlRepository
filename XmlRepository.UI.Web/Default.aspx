@@ -55,11 +55,11 @@
                     &nbsp;&nbsp;&nbsp;&nbsp;]]&gt;&lt;/example&gt;<br /><br />
                     &nbsp;&nbsp;&nbsp;&nbsp;&lt;downloads&gt;<br />
                     &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;download file="<a href="Downloads/xmlrepository-v1.1-net35.zip">assembly</a>" version="1.1" platform="net35" type="application/zip" /&gt;<br />
-                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;download file="<a href="https://peterbucher.kilnhg.com/Code/xmlrepository-ch/Group/Default" target="_blank">source</a>" version="current" platform="net35" type="mercurial" /&gt;<br />
+                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;download file="<a href="https://github.com/peterbucher/XmlRepository" target="_blank">source</a>" version="current" platform="net35" type="git" /&gt;<br />
                     &nbsp;&nbsp;&nbsp;&nbsp;&lt;/downloads&gt;<br /><br />
                     &nbsp;&nbsp;&nbsp;&nbsp;&lt;documentation /&gt;<br /><br />
                     &nbsp;&nbsp;&nbsp;&nbsp;&lt;copyright&gt;&lt;![CDATA[<br />
-                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&copy; Copyright 2009-<%= DateTime.Now.Year %> <a href="http://www.goloroden.de" target="_blank">Golo Roden</a> und <a href="http://www.peterbucher.ch" target="_blank">Peter Bucher</a>. Alle Rechte vorbehalten.<br />
+                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&copy; Copyright 2009 <a href="http://www.goloroden.de" target="_blank">Golo Roden</a> und <a href="http://www.peterbucher.ch" target="_blank">Peter Bucher</a>. Alle Rechte vorbehalten.<br />
                     &nbsp;&nbsp;&nbsp;&nbsp;]]&gt;&lt;/copyright&gt;<br />
                     &lt;/xmlrepository.ch&gt;
                 </p>
