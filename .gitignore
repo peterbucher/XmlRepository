@@ -10,3 +10,4 @@ syntax:glob
 *obj/*
 _ReSharper*
 *_ReSharper*
+XmlRepository.UI.Web/XmlRepository.UI.Web.Publish.xml
