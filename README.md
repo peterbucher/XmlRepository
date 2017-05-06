@@ -30,3 +30,5 @@
     ]]></copyright>
 </xmlrepository.ch>
 ```
+
+Download Binary: http://xmlrepository.ch/
