@@ -20,7 +20,7 @@
 
     <downloads>
         <download file="assembly" version="1.1" platform="net35" type="application/zip" />
-        <download file="source" version="current" platform="net35" type="mercurial" />
+        <download file="source" version="current" platform="net35" type="git" />
     </downloads>
 
     <documentation />
