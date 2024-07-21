@@ -1,5 +1,9 @@
 # XmlRepository
 
+## History
+
+*NOTE: Please note that XmlRepository is a project that was created in 2011, but has been abandoned since then. Hence it may not represent our current knowledge and best practices. This repository is basically there for historical reasons and for the case that anyone might be interested in the old implementation. Feel free to fork and send pull requests.*
+
 ```C#
 <xmlrepository.ch>
     <description><![CDATA[
@@ -30,5 +34,3 @@
     ]]></copyright>
 </xmlrepository.ch>
 ```
-
-Download Binary: http://xmlrepository.ch/
